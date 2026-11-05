@@ -2,33 +2,29 @@ import type { Routes } from '@angular/router';
 
 import { TabsPage } from './tabs.page';
 
+/** Driver area: mounted at /driver by app.routes.ts. */
 export const routes: Routes = [
   {
-    path: 'tabs',
+    path: '',
     component: TabsPage,
     children: [
       {
-        path: 'tab1',
-        loadComponent: () => import('../tab1/tab1.page').then((m) => m.Tab1Page),
+        path: 'fees',
+        loadComponent: () => import('../fees/fees.page').then((m) => m.FeesPage),
       },
       {
-        path: 'tab2',
-        loadComponent: () => import('../tab2/tab2.page').then((m) => m.Tab2Page),
+        path: 'students',
+        loadComponent: () => import('../students/students.page').then((m) => m.StudentsPage),
       },
       {
-        path: 'tab3',
-        loadComponent: () => import('../tab3/tab3.page').then((m) => m.Tab3Page),
+        path: 'trip',
+        loadComponent: () => import('../trip/trip.page').then((m) => m.TripPage),
       },
       {
         path: '',
-        redirectTo: '/tabs/tab1',
         pathMatch: 'full',
+        redirectTo: 'fees',
       },
     ],
-  },
-  {
-    path: '',
-    redirectTo: '/tabs/tab1',
-    pathMatch: 'full',
   },
 ];

@@ -1,0 +1,32 @@
+<ion-content [fullscreen]="true">
+  <div class="x-wrap">
+    <app-profile-bar></app-profile-bar>
+    <h1 class="x-h">Platform</h1>
+    @if (o) {
+    <div class="tiles">
+      <div class="x-card tl1"><span>Students</span><b>{{ o.students }}</b></div>
+      <div class="x-card tl1"><span>Outstanding</span><b>{{ m(o.outstanding) }}</b></div>
+      <div class="x-card tl1"><span>Collected today</span><b>{{ m(o.collected) }}</b></div>
+    </div>
+    @for (v of o.vehicles; track v.id) {
+    <article class="x-card vc">
+      <div class="hd">
+        <div>
+          <b>{{ v.label }}</b>
+          <div class="sub">Driver · {{ v.driver }}</div>
+        </div>
+        <span class="x-pill" [class.m]="v.trip === 'idle'">{{ v.trip }}</span>
+      </div>
+      <div class="x-pr">
+        <i [style.width.%]="(v.used / v.cap) * 100" [class.full]="v.used >= v.cap"></i>
+      </div>
+      <div class="hd">
+        <span class="sub">{{ v.used }}/{{ v.cap }} seats · pending {{ m(v.outstanding) }}</span>
+        <button class="x-chip" [class.on]="v.active" (click)="toggle(v)">
+          {{ v.active ? 'Active · Suspend' : 'Suspended · Activate' }}
+        </button>
+      </div>
+    </article>
+    } }
+  </div>
+</ion-content>

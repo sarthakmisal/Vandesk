@@ -1,0 +1,36 @@
+<ion-content [fullscreen]="true">
+  <div class="x-wrap">
+    <app-profile-bar></app-profile-bar>
+    <h1 class="x-h">{{ t['trip'] }}</h1>
+    <div class="ban">
+      {{ st.status === 'idle' ? 'Ready · ' + total + ' students' : st.status === 'started' ? 'Started ' + st.startedAt +
+      ' · ' + done + '/' + total + ' ✓' : '🏫 Reached school ' + st.endedAt }}
+    </div>
+    @if (st.status === 'idle') {
+    <button class="x-go" (click)="start()">▶ {{ t['start'] }}</button>
+    } @for (r of rows; track r.id) {
+    <article class="x-card" [class.off]="r.state === 'off'">
+      <div class="x-av">{{ r.name[0] }}</div>
+      <div class="x-mid"><b>{{ r.name }}</b><span>📍 {{ r.stop }}</span></div>
+      @if (r.state === 'off') {
+      <span class="x-pill m">{{ t['notComing'] }}</span>
+      } @else {
+      <button
+        class="tap"
+        [class.ok]="r.state === 'boarded'"
+        [class.sk]="r.state === 'skipped'"
+        [disabled]="st.status !== 'started'"
+        (click)="tap(r.id)"
+      >
+        {{ r.state === 'boarded' ? '✓ ' + r.at : r.state === 'skipped' ? '✕' : t['picked'] }}
+      </button>
+      @if (r.state === 'wait' && st.status === 'started') {
+      <button class="nt" (click)="skip(r.id)" aria-label="Not there">✕</button>
+      } }
+    </article>
+    } @if (st.status === 'started') {
+    <button class="x-go alt" (click)="end()">🏫 {{ t['end'] }}</button>
+    }
+    <button class="lnk" (click)="reset()">↺ Reset demo</button>
+  </div>
+</ion-content>

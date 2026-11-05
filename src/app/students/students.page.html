@@ -1,0 +1,35 @@
+<ion-content [fullscreen]="true">
+  <div class="x-wrap">
+    <app-profile-bar></app-profile-bar>
+    <h1 class="x-h">{{ t['students'] }}</h1>
+    <div class="seats">
+      @for (v of veh; track v.id) {
+      <div class="sv">
+        <div><b>{{ v.short }}</b><span>{{ v.used }}/{{ v.cap }}</span></div>
+        <div class="x-pr">
+          <i [style.width.%]="(v.used / v.cap) * 100" [class.full]="v.used >= v.cap"></i>
+        </div>
+      </div>
+      }
+    </div>
+    <input
+      class="x-in"
+      style="margin-bottom: 14px"
+      [placeholder]="'🔍 ' + t['search']"
+      [attr.aria-label]="t['search']"
+      (input)="setQuery($event)"
+    />
+    @for (r of shown; track r.id) {
+    <article class="x-card">
+      <div class="x-av">{{ r.name[0] }}</div>
+      <div class="x-mid"><b>{{ r.name }}</b><span>Class {{ r.cls }} · 📍 {{ r.stop }}</span></div>
+      <span class="x-pill">{{ r.vehicle }}</span>
+    </article>
+    } @if (!loading && !shown.length) {
+    <div class="empty">🔍 —</div>
+    }
+  </div>
+  <ion-fab slot="fixed" vertical="bottom" horizontal="center">
+    <button class="x-go alt add" (click)="add()">＋ {{ t['add'] }}</button>
+  </ion-fab>
+</ion-content>

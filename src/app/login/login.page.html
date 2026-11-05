@@ -1,0 +1,18 @@
+<ion-content>
+  <div class="x-wrap">
+    <div class="logo">🚐</div>
+    <h1 class="x-h" style="text-align: center">VanDesk</h1>
+    <p class="sub" style="text-align: center">Demo sign-in. The real app uses an email OTP.</p>
+    @for (g of groups; track g.t) {
+    <div class="x-lb">{{ g.t }}</div>
+    @for (a of g.list; track a.id) {
+    <button class="x-card acc" (click)="go(a)">
+      <div class="x-av">{{ a.name[0] }}</div>
+      <div class="x-mid"><b>{{ a.name }}</b><span>{{ a.email }}</span></div>
+      <span class="x-pill">→</span>
+    </button>
+    } } @if (err) {
+    <div class="x-err">{{ err }}</div>
+    }
+  </div>
+</ion-content>

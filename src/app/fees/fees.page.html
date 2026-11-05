@@ -1,0 +1,27 @@
+<ion-content [fullscreen]="true">
+  <div class="wrap">
+    <app-profile-bar></app-profile-bar>
+    <section class="hero">
+      <div class="top">
+        <span class="brand">🚐 {{ t['title'] }}</span>
+      </div>
+      <div class="big">{{ m(pending) }}</div>
+      <div class="sub">{{ t['pending'] }} · {{ rows.length }}</div>
+      <div class="pill">{{ t['today'] }} <b>{{ m(today) }}</b></div>
+    </section>
+
+    @if (loading) { @for (i of skeleton; track i) {
+    <div class="sk"></div>
+    } } @if (err && !loading) {
+    <div class="err">{{ t['err'] }}<button (click)="load()">{{ t['retry'] }}</button></div>
+    } @for (r of rows; track r.id) {
+    <article class="card" (click)="open(r)" (keydown.enter)="open(r)" tabindex="0" role="button">
+      <div class="av" [style.background]="hue(r.name)">{{ r.name[0] }}</div>
+      <div class="mid"><b>{{ r.name }}</b><span>{{ r.months }} {{ t['months'] }}</span></div>
+      <div class="right"><b>{{ m(r.balance) }}</b><span class="btn">✓ {{ t['received'] }}</span></div>
+    </article>
+    } @if (!loading && !err && !rows.length) {
+    <div class="clear">🎉 {{ t['clear'] }}</div>
+    }
+  </div>
+</ion-content>

@@ -1,0 +1,17 @@
+<div class="pb">
+  <div class="w">
+    <span class="a">{{ n[0] }}</span>
+    <div>
+      <b>{{ n }}</b
+      ><small>{{ role }}</small>
+    </div>
+  </div>
+  <div class="r">
+    <div class="lg">
+      @for (l of langs; track l) {
+        <button [class.on]="l === cur" (click)="set(l)">{{ label(l) }}</button>
+      }
+    </div>
+    <button class="o" (click)="out()" aria-label="Log out">⎋</button>
+  </div>
+</div>

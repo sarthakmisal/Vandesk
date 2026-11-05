@@ -1,0 +1,38 @@
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.tl1 {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 14px;
+  min-height: 0;
+  margin: 0;
+  span {
+    color: #94a3b8;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  b {
+    font-size: 20px;
+    color: #1e1b4b;
+  }
+}
+.vc {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+.hd {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  b {
+    font-size: 17px;
+    color: #0f172a;
+  }
+}

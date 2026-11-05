@@ -1,0 +1,33 @@
+<ion-content>
+  <div class="as">
+    <h2>{{ t['add'] }}</h2>
+    <div class="x-lb">Vehicle</div>
+    <div class="x-chips">
+      @for (v of veh; track v.id) {
+        <button class="x-chip" [class.on]="f.veh === v.id" [disabled]="v.used >= v.cap" (click)="pick(v.id)">
+          {{ v.short }}<small>{{ v.used >= v.cap ? 'Full' : v.cap - v.used + ' seats free' }}</small>
+        </button>
+      }
+    </div>
+    <div class="x-lb">Pickup stop</div>
+    <div class="x-chips">
+      @for (s of stops; track s.id) {
+        <button class="x-chip" [class.on]="f.stop === s.id" (click)="f.stop = s.id">{{ s.name }}</button>
+      }
+    </div>
+    <label class="x-lb" for="as-name">Student name</label>
+    <input id="as-name" class="x-in" autocomplete="off" (input)="set('name', $event)" />
+    <label class="x-lb" for="as-cls">Class</label>
+    <input id="as-cls" class="x-in" (input)="set('cls', $event)" />
+    <label class="x-lb" for="as-gname">Guardian name</label>
+    <input id="as-gname" class="x-in" autocomplete="off" (input)="set('gname', $event)" />
+    <label class="x-lb" for="as-email">Guardian email</label>
+    <input id="as-email" class="x-in" type="email" inputmode="email" (input)="set('email', $event)" />
+    <label class="x-lb" for="as-phone">Guardian phone</label>
+    <input id="as-phone" class="x-in" type="tel" inputmode="tel" (input)="set('phone', $event)" />
+    @if (err) {
+      <div class="x-err">{{ err }}</div>
+    }
+    <button class="x-go" style="margin-top: 18px" (click)="save()">✓ {{ t['add'] }}</button>
+  </div>
+</ion-content>

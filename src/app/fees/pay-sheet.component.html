@@ -1,0 +1,31 @@
+<div class="ps">
+  <div class="who">
+    {{ row.name }}<small>{{ row.months }} {{ t['months'] }}</small>
+  </div>
+  <div class="amt">{{ m(amount) }}</div>
+  <div class="chips">
+    @for (s of row.steps; track $index; let i = $index) {
+      <button [class.on]="!custom && amount === s" (click)="amount = s; custom = false">
+        {{ i === row.steps.length - 1 ? t['all'] : i + 1 }}<b>{{ m(s) }}</b>
+      </button>
+    }
+  </div>
+  @if (!custom) {
+    <button class="lnk" (click)="custom = true">{{ t['other'] }}</button>
+  }
+  @if (custom) {
+    <input
+      type="number"
+      inputmode="numeric"
+      min="1"
+      placeholder="₹"
+      aria-label="Amount in rupees"
+      (input)="setCustom($event)"
+    />
+  }
+  <div class="mode">
+    <button [class.on]="mode === 'cash'" (click)="mode = 'cash'">💵 {{ t['cash'] }}</button>
+    <button [class.on]="mode === 'upi'" (click)="mode = 'upi'">📱 {{ t['upi'] }}</button>
+  </div>
+  <button class="go" [disabled]="!(amount > 0)" (click)="ok()">✓ {{ t['received'] }} {{ m(amount) }}</button>
+</div>

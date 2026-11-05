@@ -1,0 +1,59 @@
+<ion-content [fullscreen]="true">
+  <div class="x-wrap">
+    <app-profile-bar></app-profile-bar>
+    <h1 class="x-h">{{ kids.length > 1 ? 'My children' : 'My child' }}</h1>
+    <div class="x-chips">
+      @for (k of kids; track k.id) {
+      <button class="x-chip" [class.on]="k.id === child" (click)="pick(k.id)">{{ k.name.split(' ')[0] }}</button>
+      }
+    </div>
+    <div class="x-seg">
+      <button [class.on]="tab === 'status'" (click)="tab = 'status'">📍 Track</button>
+      <button [class.on]="tab === 'fees'" (click)="tab = 'fees'">💰 Fees</button>
+    </div>
+
+    @if (p && tab === 'status') {
+    <div class="x-card pc">
+      <div class="msg">{{ msg() }}</div>
+      @if (p.last) {
+      <div class="sub">Last stop: {{ p.last.stop }} · {{ p.last.at }}</div>
+      } @if (!p.picked && p.going) {
+      <div class="sub">Usually at your stop ~{{ p.typical }}</div>
+      }
+    </div>
+    <div class="tl">
+      @for (s of p.stops; track s.name) {
+      <div class="st" [class.done]="s.done" [class.me]="s.mine">
+        <i></i><span>{{ s.name }}</span><small>{{ s.typical }}</small>
+        @if (s.mine) {
+        <em>your stop</em>
+        }
+      </div>
+      }
+    </div>
+    <button class="x-go alt" [disabled]="p.locked" (click)="going(!p.going)">
+      {{ p.going ? '🚫 ' + t['notGoing'] : '✓ Going today' }}
+    </button>
+    @if (p.locked) {
+    <div class="x-err">Trip started. Please call the driver.</div>
+    } } @if (fee && tab === 'fees') {
+    <div class="x-card pc">
+      <div class="sub">Pending</div>
+      <div class="msg">{{ m(fee.balance) }}</div>
+    </div>
+    <div class="tl">
+      @for (r of fee.rows; track r.per) {
+      <div class="st">
+        <span>{{ mon(r.per) }}</span><small>{{ m(r.paid) }} / {{ m(r.amt) }}</small>
+        @if (r.paid >= r.amt) {
+        <em>paid</em>
+        }
+      </div>
+      }
+    </div>
+    <div class="sub" style="padding: 0 6px">Fees are collected by your driver. Ask him to record any payment.</div>
+    } @if (!kids.length) {
+    <div class="empty">No children linked to this account.</div>
+    }
+  </div>
+</ion-content>

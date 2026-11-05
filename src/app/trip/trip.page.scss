@@ -1,0 +1,51 @@
+.ban {
+  background: linear-gradient(135deg, #e0e3ff, #fff);
+  border: 1px solid #e6e8f5;
+  border-radius: 20px;
+  padding: 14px 18px;
+  font-weight: 700;
+  color: #1e1b4b;
+  margin-bottom: 14px;
+}
+.x-go {
+  margin: 6px 0 14px;
+}
+.off {
+  opacity: 0.55;
+}
+.tap {
+  border: 0;
+  border-radius: 16px;
+  min-width: 104px;
+  padding: 14px 12px;
+  font-weight: 800;
+  font-size: 15px;
+  color: #fff;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  &.ok {
+    background: linear-gradient(135deg, #10b981, #059669);
+  }
+  &.sk {
+    background: #cbd5e1;
+  }
+  &[disabled] {
+    opacity: 0.45;
+  }
+}
+.nt {
+  border: 0;
+  background: #f1f5f9;
+  border-radius: 12px;
+  width: 36px;
+  height: 36px;
+  color: #64748b;
+  font-weight: 800;
+}
+.lnk {
+  display: block;
+  margin: 10px auto;
+  border: 0;
+  background: none;
+  color: #94a3b8;
+  font-weight: 600;
+}

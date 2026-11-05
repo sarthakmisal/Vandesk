@@ -2,11 +2,11 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Ionic App</title>
+    <title>VanDesk</title>
 
     <base href="/" />
 
-    <meta name="color-scheme" content="light dark" />
+    <meta name="color-scheme" content="light" />
     <meta
       name="viewport"
       content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
@@ -14,7 +14,10 @@
     <meta name="format-detection" content="telephone=no" />
     <meta name="msapplication-tap-highlight" content="no" />
 
-    <link rel="icon" type="image/png" href="assets/icon/favicon.png" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🚐</text></svg>"
+    />
 
     <!-- add to homescreen for ios -->
     <meta name="mobile-web-app-capable" content="yes" />
@@ -22,6 +25,21 @@
   </head>
 
   <body>
-    <app-root></app-root>
+    <!-- visible until Angular boots: no white flash -->
+    <app-root>
+      <div
+        style="
+          display: grid;
+          place-items: center;
+          height: 100vh;
+          background: #f5f6fb;
+          color: #4f46e5;
+          font: 700 18px system-ui;
+        "
+      >
+        🚐 Loading…
+      </div>
+    </app-root>
+    <noscript>Please enable JavaScript.</noscript>
   </body>
 </html>
