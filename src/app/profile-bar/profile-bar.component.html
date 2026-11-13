@@ -1,0 +1,17 @@
+<div class="pb">
+  <div class="who">
+    <span class="avatar">{{ name()[0] }}</span>
+    <div>
+      <b>{{ name() }}</b>
+      <small>{{ role() }}</small>
+    </div>
+  </div>
+  <div class="right">
+    <div class="lang">
+      @for (l of langs; track l) {
+        <button type="button" [class.on]="l === cur()" (click)="set(l)">{{ label(l) }}</button>
+      }
+    </div>
+    <button type="button" class="out" aria-label="Log out" (click)="out()">⎋</button>
+  </div>
+</div>

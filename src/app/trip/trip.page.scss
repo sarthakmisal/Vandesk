@@ -7,12 +7,15 @@
   color: #1e1b4b;
   margin-bottom: 14px;
 }
-.x-go {
+
+.go {
   margin: 6px 0 14px;
 }
+
 .off {
   opacity: 0.55;
 }
+
 .tap {
   border: 0;
   border-radius: 16px;
@@ -22,16 +25,20 @@
   font-size: 15px;
   color: #fff;
   background: linear-gradient(135deg, #4f46e5, #7c3aed);
+
   &.ok {
     background: linear-gradient(135deg, #10b981, #059669);
   }
+
   &.sk {
     background: #cbd5e1;
   }
+
   &[disabled] {
     opacity: 0.45;
   }
 }
+
 .nt {
   border: 0;
   background: #f1f5f9;
@@ -41,6 +48,7 @@
   color: #64748b;
   font-weight: 800;
 }
+
 .lnk {
   display: block;
   margin: 10px auto;

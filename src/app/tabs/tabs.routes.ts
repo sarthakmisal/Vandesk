@@ -2,7 +2,6 @@ import type { Routes } from '@angular/router';
 
 import { TabsPage } from './tabs.page';
 
-/** Driver area: mounted at /driver by app.routes.ts. */
 export const routes: Routes = [
   {
     path: '',
@@ -21,9 +20,13 @@ export const routes: Routes = [
         loadComponent: () => import('../trip/trip.page').then((m) => m.TripPage),
       },
       {
+        path: 'ledger',
+        loadComponent: () => import('../ledger/ledger.page').then((m) => m.LedgerPage),
+      },
+      {
         path: '',
+        redirectTo: '/driver/fees',
         pathMatch: 'full',
-        redirectTo: 'fees',
       },
     ],
   },

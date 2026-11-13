@@ -1,8 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 
-import { AuthService } from '../core/auth';
-import { MockDb } from '../core/mock.db';
+import { AuthService } from '../core/auth.service';
+import { MockDb } from '../core/mock-db';
 import { FeesRepo } from '../fees/fees.repo';
+import type { MockTripRepo } from '../trip/trip.repo';
 import { TripRepo } from '../trip/trip.repo';
 
 export interface VOver {
@@ -30,18 +31,17 @@ export abstract class AdminRepo {
 
 @Injectable()
 export class MockAdminRepo extends AdminRepo {
-  private db = inject(MockDb);
-  private auth = inject(AuthService);
-  private fees = inject(FeesRepo);
-  private trip = inject(TripRepo);
+  private readonly db = inject(MockDb);
+  private readonly auth = inject(AuthService);
+  private readonly fees = inject(FeesRepo);
+  private readonly trip = inject(TripRepo) as MockTripRepo; // the mock admin reads trip status straight from the mock trip repo
 
   async overview(): Promise<Overview> {
     this.auth.require('admin.view');
     const rows = await this.fees.list();
     const vehicles = await Promise.all(
-      this.db.vehicles.map(async (v): Promise<VOver> => {
-        const d = this.db.drivers.find((x) => x.veh === v.id);
-        if (!d) throw Error('Driver not found');
+      this.db.vehicles.map(async (v) => {
+        const d = this.db.drivers.find((x) => x.veh === v.id)!;
         return {
           id: v.id,
           label: v.label,
@@ -51,7 +51,7 @@ export class MockAdminRepo extends AdminRepo {
           used: this.db.students.filter((s) => s.veh === v.id && s.status !== 'left').length,
           cap: v.cap,
           outstanding: rows.filter((r) => r.veh === v.id).reduce((x, r) => x + r.balance, 0),
-          trip: (await this.trip.status(v.id)).status,
+          trip: this.trip.adminStatus(v.id).status,
         };
       }),
     );
@@ -66,7 +66,9 @@ export class MockAdminRepo extends AdminRepo {
   async setDriverActive(id: string, active: boolean): Promise<void> {
     this.auth.require('drivers.manage');
     const d = this.db.drivers.find((x) => x.id === id);
-    if (!d) throw Error('Not found');
+    if (!d) {
+      throw new Error('Not found');
+    }
     d.active = active;
   }
 }

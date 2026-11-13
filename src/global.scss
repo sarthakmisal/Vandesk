@@ -1,52 +1,49 @@
 /*
  * App Global CSS
  * ----------------------------------------------------------------------------
- * Shared VanDesk UI classes (.x-*) used by every screen.
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
  * For more information on global stylesheets, visit the documentation:
  * https://ionicframework.com/docs/layout/global-stylesheets
  */
 
 /* Core CSS required for Ionic components to work properly */
-@import "@ionic/angular/css/core.css";
+@import '@ionic/angular/css/core.css';
 
 /* Basic CSS for apps built with Ionic */
-@import "@ionic/angular/css/normalize.css";
-@import "@ionic/angular/css/structure.css";
-@import "@ionic/angular/css/typography.css";
+@import '@ionic/angular/css/normalize.css';
+@import '@ionic/angular/css/structure.css';
+@import '@ionic/angular/css/typography.css';
+@import '@ionic/angular/css/display.css';
 
-/* Optional CSS utils */
-@import "@ionic/angular/css/padding.css";
-@import "@ionic/angular/css/flex-utils.css";
+/* Optional CSS utils that can be commented out */
+@import '@ionic/angular/css/padding.css';
+@import '@ionic/angular/css/float-elements.css';
+@import '@ionic/angular/css/text-alignment.css';
+@import '@ionic/angular/css/text-transformation.css';
+@import '@ionic/angular/css/flex-utils.css';
 
-/*
- * Dark mode is intentionally NOT imported: the VanDesk UI is light-only
- * (hard-coded light colours + <meta name="color-scheme" content="light">).
- * Importing a dark palette would turn Ionic's modals/toasts dark on dark-mode phones.
+/**
+ * Ionic Dark Mode
+ * -----------------------------------------------------
+ * For more info, please see:
+ * https://ionicframework.com/docs/theming/dark-mode
  */
 
-:root {
-  --ion-font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --ion-color-primary: #4f46e5;
-}
+/* @import "@ionic/angular/css/palettes/dark.always.css"; */
+/* @import "@ionic/angular/css/palettes/dark.class.css"; */
+/* The app is light-only by design (high contrast for drivers), so no dark palette is imported. */
+/* @import '@ionic/angular/css/palettes/dark.system.css'; */
 
+/**
+ * VanDesk shared UI
+ * -----------------------------------------------------
+ * Small set of reusable classes (prefix x-) used by every page. Page-specific styles live next to each page.
+ */
 ion-content {
   --background: #f5f6fb;
-}
-
-ion-tab-bar {
-  --background: #fff;
-  --border: 1px solid #eceef7;
-  height: 64px;
-}
-
-ion-tab-button {
-  --color: #94a3b8;
-  --color-selected: #4f46e5;
-  font-weight: 700;
-  .ti {
-    font-size: 22px;
-    line-height: 1;
-  }
 }
 
 .x-wrap {
@@ -68,6 +65,7 @@ ion-tab-button {
   display: flex;
   align-items: center;
   gap: 12px;
+  width: 100%;
   background: #fff;
   border: 1px solid #eceef7;
   border-radius: 22px;
@@ -75,6 +73,18 @@ ion-tab-button {
   margin-bottom: 12px;
   min-height: 76px;
   box-shadow: 0 10px 24px -16px rgba(30, 27, 75, 0.35);
+  font: inherit;
+  color: inherit;
+  text-align: left;
+}
+
+button.x-card {
+  cursor: pointer;
+  transition: transform 0.12s ease;
+
+  &:active {
+    transform: scale(0.985);
+  }
 }
 
 .x-av {
@@ -93,6 +103,7 @@ ion-tab-button {
 .x-mid {
   flex: 1;
   min-width: 0;
+
   b {
     display: block;
     font-size: 17px;
@@ -101,9 +112,11 @@ ion-tab-button {
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
   span {
     color: #94a3b8;
     font-size: 13px;
+    font-weight: 500;
   }
 }
 
@@ -122,14 +135,17 @@ ion-tab-button {
   font-weight: 700;
   font-size: 15px;
   color: #475569;
+
   &.on {
     border-color: #4f46e5;
     background: #eef0ff;
     color: #4f46e5;
   }
+
   &[disabled] {
     opacity: 0.45;
   }
+
   small {
     display: block;
     font-weight: 500;
@@ -148,13 +164,16 @@ ion-tab-button {
   color: #fff;
   background: linear-gradient(135deg, #10b981, #059669);
   box-shadow: 0 14px 28px -12px rgba(5, 150, 105, 0.6);
+
   &.alt {
     background: linear-gradient(135deg, #4f46e5, #7c3aed);
     box-shadow: 0 14px 28px -12px rgba(79, 70, 229, 0.55);
   }
+
   &[disabled] {
     opacity: 0.4;
   }
+
   &.add {
     width: auto;
     padding: 16px 26px;
@@ -190,6 +209,7 @@ ion-tab-button {
   font-weight: 700;
   background: #eef0ff;
   color: #4f46e5;
+
   &.m {
     background: #f1f5f9;
     color: #94a3b8;
@@ -203,6 +223,7 @@ ion-tab-button {
   border-radius: 16px;
   padding: 4px;
   margin-bottom: 14px;
+
   button {
     flex: 1;
     border: 0;
@@ -211,6 +232,7 @@ ion-tab-button {
     padding: 11px;
     font-weight: 700;
     color: #64748b;
+
     &.on {
       background: #4f46e5;
       color: #fff;
@@ -223,10 +245,12 @@ ion-tab-button {
   border-radius: 9px;
   background: #e6e8f5;
   overflow: hidden;
+
   i {
     display: block;
     height: 100%;
     background: linear-gradient(90deg, #4f46e5, #7c3aed);
+
     &.full {
       background: #dc2626;
     }
@@ -239,34 +263,7 @@ ion-tab-button {
   margin: 12px 2px 0;
 }
 
-.seats {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 14px;
-  .sv {
-    flex: 1;
-    background: #fff;
-    border: 1px solid #eceef7;
-    border-radius: 18px;
-    padding: 12px 14px;
-    div:first-child {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
-      span {
-        color: #64748b;
-        font-weight: 600;
-      }
-    }
-  }
-}
-
-.empty {
-  text-align: center;
-  padding: 30px;
-  color: #94a3b8;
-}
-
+/* status card + stops timeline (parent view) */
 .pc {
   flex-direction: column;
   align-items: flex-start;
@@ -301,9 +298,11 @@ ion-tab-button {
   color: #94a3b8;
   font-weight: 600;
   border-top: 1px solid #f1f2f8;
+
   &:first-child {
     border: 0;
   }
+
   i {
     width: 14px;
     height: 14px;
@@ -312,22 +311,28 @@ ion-tab-button {
     flex: none;
     background: #fff;
   }
+
   span {
     flex: 1;
   }
+
   small {
     font-weight: 600;
   }
+
   &.done {
     color: #0f172a;
+
     i {
       border-color: #10b981;
       background: #10b981;
     }
   }
+
   &.me span {
     color: #4f46e5;
   }
+
   em {
     font-style: normal;
     font-size: 11px;

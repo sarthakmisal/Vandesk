@@ -1,12 +1,13 @@
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { IonContent, ToastController } from '@ionic/angular';
 
-import { money } from '../fees/fees.models';
-import { ProfileBarComponent } from '../shared/profile-bar/profile-bar.component';
+import { money } from '../core/format';
+import { ProfileBarComponent } from '../profile-bar/profile-bar.component';
 
 import type { Overview, VOver } from './admin.repo';
 import { AdminRepo } from './admin.repo';
 
+/** VanDesk team: platform overview and driver access. No daily operations. */
 @Component({
   selector: 'app-admin',
   templateUrl: 'admin.page.html',
@@ -14,26 +15,26 @@ import { AdminRepo } from './admin.repo';
   imports: [IonContent, ProfileBarComponent],
 })
 export class AdminPage {
-  private repo = inject(AdminRepo);
-  private toast = inject(ToastController);
-  private cd = inject(ChangeDetectorRef);
-  o?: Overview;
-  m = money;
+  private readonly repo = inject(AdminRepo);
+  private readonly toast = inject(ToastController);
+
+  readonly o = signal<Overview | undefined>(undefined);
+  readonly money = money;
 
   ionViewWillEnter(): void {
-    this.load();
+    void this.load();
   }
 
   async load(): Promise<void> {
-    this.o = await this.repo.overview();
-    this.cd.markForCheck();
+    this.o.set(await this.repo.overview());
   }
 
   async toggle(v: VOver): Promise<void> {
     try {
       await this.repo.setDriverActive(v.driverId, !v.active);
     } catch (e) {
-      (await this.toast.create({ message: (e as Error).message, duration: 2500, color: 'dark' })).present();
+      const toast = await this.toast.create({ message: (e as Error).message, duration: 2500, color: 'dark' });
+      await toast.present();
     }
     await this.load();
   }

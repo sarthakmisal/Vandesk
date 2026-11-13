@@ -1,7 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 
-import { AuthService } from '../core/auth';
-import { MockDb } from '../core/mock.db';
+import { AuthService } from '../core/auth.service';
+import type { Direction } from '../core/direction';
+import type { Fix } from '../core/geo';
+import { MockDb } from '../core/mock-db';
 
 export type RState = 'wait' | 'boarded' | 'skipped' | 'off';
 export interface TRow {
@@ -10,6 +12,8 @@ export interface TRow {
   stop: string;
   state: RState;
   at?: string;
+  /** Parent changed to Not going after the cutoff (driver sees a badge). */
+  late?: boolean;
 }
 export interface TState {
   status: 'idle' | 'started' | 'ended';
@@ -17,6 +21,7 @@ export interface TState {
   endedAt?: string;
 }
 export interface PInfo {
+  direction: Direction;
   going: boolean;
   locked: boolean;
   status: TState['status'];
@@ -24,24 +29,27 @@ export interface PInfo {
   away: number | null;
   typical: string;
   last?: { stop: string; at: string };
+  /** Last stop location, rounded to about 100 m (R-LOC-5). Only when the fix was accurate. */
+  pin?: { lat: number; lng: number };
   stops: { name: string; done: boolean; mine: boolean; typical: string }[];
 }
 
 export abstract class TripRepo {
   // driver (own vehicle only)
-  abstract roster(): Promise<TRow[]>;
-  abstract state(): Promise<TState>;
-  abstract start(): Promise<void>;
-  abstract tap(sid: string): Promise<void>; // one tap = picked up; tap again = undo
-  abstract notThere(sid: string): Promise<void>;
-  abstract end(): Promise<void>;
+  abstract roster(dir: Direction): Promise<TRow[]>;
+  abstract state(dir: Direction): Promise<TState>;
+  abstract start(dir: Direction): Promise<void>;
+  /** One tap = picked up (or dropped); tap again = undo. Location is captured at the tap, never in the background. */
+  abstract tap(sid: string, dir: Direction, fix?: Fix): Promise<void>;
+  abstract notThere(sid: string, dir: Direction): Promise<void>;
+  abstract end(dir: Direction): Promise<void>;
   // parent (own children only)
   abstract children(): Promise<{ id: string; name: string }[]>;
-  abstract parent(sid: string): Promise<PInfo>;
-  abstract setGoing(sid: string, going: boolean): Promise<void>; // locked once the trip starts (R-ATT-3)
-  // admin (read-only)
-  abstract status(veh: string): Promise<TState>;
-  abstract reset(): Promise<void>; // demo only
+  abstract parent(sid: string, dir: Direction): Promise<PInfo>;
+  /** Locked once the trip starts (R-ATT-3). */
+  abstract setGoing(sid: string, going: boolean, dir: Direction): Promise<void>;
+  /** Demo only (mock mode). */
+  abstract reset(): Promise<void>;
 }
 
 interface Ev {
@@ -51,7 +59,7 @@ interface Ev {
   seq: number;
   stop: string;
 }
-interface Tr {
+interface Trip {
   status: TState['status'];
   startedAt?: string;
   endedAt?: string;
@@ -60,101 +68,57 @@ interface Tr {
 
 @Injectable()
 export class MockTripRepo extends TripRepo {
-  private db = inject(MockDb);
-  private auth = inject(AuthService);
-  private going: Record<string, boolean> = { s2: false }; // seed: one parent already said "not going"
-  private tr: Record<string, Tr> = {};
+  private readonly db = inject(MockDb);
+  private readonly auth = inject(AuthService);
+  private going: Record<string, boolean> = { 's2:pickup': false }; // seed: one parent already said "not going"
+  private trips: Record<string, Trip> = {};
 
-  private T(v: string) {
-    return (this.tr[v] ??= { status: 'idle', ev: [] });
-  }
-  private now() {
-    return new Date().toTimeString().slice(0, 5);
-  }
-  private stu(sid: string) {
-    return this.db.students.find((s) => s.id === sid);
-  }
-  private stop(id: string) {
-    return this.db.stops.find((t) => t.id === id);
-  }
-  private drv() {
-    this.auth.require('trip.run');
-    return this.auth.session?.veh ?? '';
-  }
-  private own(sid: string) {
-    this.auth.require('attendance.set');
-    const s = this.stu(sid);
-    if (!s || !this.auth.ownsChild(sid)) throw Error('Not allowed');
-    return s;
-  }
-
-  async roster(): Promise<TRow[]> {
-    const v = this.drv(),
-      t = this.T(v);
+  async roster(dir: Direction): Promise<TRow[]> {
+    const v = this.drv();
+    const t = this.trip(v, dir);
+    const sign = dir === 'pickup' ? 1 : -1; // the drop run visits the route in reverse
     return this.db.students
       .filter((s) => s.veh === v && s.status === 'active')
       .map((s) => {
-        const e = t.ev.find((x) => x.sid === s.id),
-          st = this.stop(s.stop);
-        return {
-          id: s.id,
-          name: s.name,
-          stop: st?.name ?? '',
-          seq: st?.seq ?? 99,
-          state: (this.going[s.id] === false ? 'off' : e ? e.st : 'wait') as RState,
-          at: e?.at,
-        };
+        const e = t.ev.find((x) => x.sid === s.id);
+        const st = this.stop(s.stop);
+        const state: RState = this.going[`${s.id}:${dir}`] === false ? 'off' : e ? e.st : 'wait';
+        return { row: { id: s.id, name: s.name, stop: st?.name ?? '', state, at: e?.at }, seq: st?.seq ?? 99 };
       })
-      .sort((a, b) => a.seq - b.seq || a.name.localeCompare(b.name)) // route order (R-TRIP-2)
-      .map((r) => ({ id: r.id, name: r.name, stop: r.stop, state: r.state, at: r.at }));
+      .sort((a, b) => sign * (a.seq - b.seq) || a.row.name.localeCompare(b.row.name)) // route order (R-TRIP-2)
+      .map((x) => x.row);
   }
 
-  async state(): Promise<TState> {
-    const t = this.T(this.drv());
-    return { status: t.status, startedAt: t.startedAt, endedAt: t.endedAt };
+  async state(dir: Direction): Promise<TState> {
+    return this.view(this.trip(this.drv(), dir));
   }
 
-  async status(v: string): Promise<TState> {
-    if (!(this.auth.can('admin.view') || this.auth.ownsVeh(v))) throw Error('Not allowed');
-    const t = this.T(v);
-    return { status: t.status, startedAt: t.startedAt, endedAt: t.endedAt };
+  /** Mock admin overview reads this directly. */
+  adminStatus(veh: string): TState {
+    const run = (['pickup', 'drop'] as const).map((d) => this.trip(veh, d).status);
+    return { status: run.includes('started') ? 'started' : run.includes('ended') ? 'ended' : 'idle' };
   }
 
-  async start(): Promise<void> {
-    const t = this.T(this.drv());
+  async start(dir: Direction): Promise<void> {
+    const t = this.trip(this.drv(), dir);
     t.status = 'started';
     t.startedAt = this.now();
     t.ev = [];
   }
 
-  async end(): Promise<void> {
-    const t = this.T(this.drv());
+  /** Never blocked, even with unmarked students (R-TRIP-5). */
+  async end(dir: Direction): Promise<void> {
+    const t = this.trip(this.drv(), dir);
     t.status = 'ended';
     t.endedAt = this.now();
-  } // never blocked (R-TRIP-5)
-
-  private toggle(sid: string, st: Ev['st']) {
-    const v = this.drv(),
-      s = this.stu(sid);
-    if (!s || s.veh !== v) throw Error('Not allowed');
-    const t = this.T(v);
-    if (t.status !== 'started') throw Error('Start the trip first');
-    if (this.going[sid] === false) return;
-    const i = t.ev.findIndex((e) => e.sid === sid),
-      same = i >= 0 && t.ev[i].st === st;
-    if (i >= 0) t.ev.splice(i, 1);
-    if (!same) {
-      const p = this.stop(s.stop);
-      t.ev.push({ sid, st, at: this.now(), seq: p?.seq ?? 0, stop: p?.name ?? '' });
-    }
   }
 
-  async tap(sid: string): Promise<void> {
-    this.toggle(sid, 'boarded');
+  async tap(sid: string, dir: Direction): Promise<void> {
+    this.toggle(sid, dir, 'boarded');
   }
 
-  async notThere(sid: string): Promise<void> {
-    this.toggle(sid, 'skipped');
+  async notThere(sid: string, dir: Direction): Promise<void> {
+    this.toggle(sid, dir, 'skipped');
   }
 
   async children(): Promise<{ id: string; name: string }[]> {
@@ -162,35 +126,42 @@ export class MockTripRepo extends TripRepo {
     return this.db.students.filter((s) => this.auth.ownsChild(s.id)).map((s) => ({ id: s.id, name: s.name }));
   }
 
-  async setGoing(sid: string, g: boolean): Promise<void> {
+  async setGoing(sid: string, going: boolean, dir: Direction): Promise<void> {
     const s = this.own(sid);
-    if (this.T(s.veh).status === 'started') throw Error('Trip already started. Please call the driver.');
-    this.going[sid] = g;
+    if (this.trip(s.veh, dir).status !== 'idle') {
+      throw new Error('Trip already started. Please call the driver.');
+    }
+    this.going[`${sid}:${dir}`] = going;
   }
 
-  async parent(sid: string): Promise<PInfo> {
-    const s = this.own(sid),
-      t = this.T(s.veh),
-      my = this.stop(s.stop),
-      b = t.ev.filter((e) => e.st === 'boarded'),
-      last = b[b.length - 1];
-    const lastSeq = b.reduce((m, e) => Math.max(m, e.seq), 0),
-      me = b.find((e) => e.sid === sid),
-      a = my ? my.seq - lastSeq - 1 : -1;
+  async parent(sid: string, dir: Direction): Promise<PInfo> {
+    const s = this.own(sid);
+    const t = this.trip(s.veh, dir);
+    const sign = dir === 'pickup' ? 1 : -1;
+    const ord = (seq: number) => sign * seq;
+    const my = this.stop(s.stop);
+    const boarded = t.ev.filter((e) => e.st === 'boarded');
+    const last = boarded[boarded.length - 1];
+    const progress = boarded.reduce((m, e) => Math.max(m, ord(e.seq)), -Infinity);
+    const me = boarded.find((e) => e.sid === sid);
+    const maxSeq = this.db.stops.filter((x) => x.veh === s.veh).reduce((m, x) => Math.max(m, x.seq), 0);
+    const base = boarded.length ? progress : dir === 'pickup' ? 0 : -(maxSeq + 1); // before the first stop of this run
+    const away = my ? ord(my.seq) - base - 1 : -1;
     return {
-      going: this.going[sid] !== false,
+      direction: dir,
+      going: this.going[`${sid}:${dir}`] !== false,
       locked: t.status !== 'idle',
       status: t.status,
       picked: me?.at,
       typical: my?.typical ?? '',
-      away: t.status === 'started' && !me && a >= 0 ? a : null,
+      away: t.status === 'started' && !me && away >= 0 ? away : null,
       last: last ? { stop: last.stop, at: last.at } : undefined,
       stops: this.db.stops
         .filter((x) => x.veh === s.veh)
-        .sort((x, y) => x.seq - y.seq)
+        .sort((x, y) => ord(x.seq) - ord(y.seq))
         .map((x) => ({
           name: x.name,
-          done: t.status !== 'idle' && x.seq <= lastSeq,
+          done: t.status !== 'idle' && boarded.length > 0 && ord(x.seq) <= progress,
           mine: x.id === s.stop,
           typical: x.typical,
         })),
@@ -198,7 +169,61 @@ export class MockTripRepo extends TripRepo {
   }
 
   async reset(): Promise<void> {
-    this.tr = {};
-    this.going = { s2: false };
+    this.trips = {};
+    this.going = { 's2:pickup': false };
+  }
+
+  private trip(v: string, dir: Direction): Trip {
+    return (this.trips[`${v}:${dir}`] ??= { status: 'idle', ev: [] });
+  }
+
+  private view(t: Trip): TState {
+    return { status: t.status, startedAt: t.startedAt, endedAt: t.endedAt };
+  }
+
+  private now(): string {
+    return new Date().toTimeString().slice(0, 5);
+  }
+
+  private stop(id: string) {
+    return this.db.stops.find((t) => t.id === id);
+  }
+
+  private drv(): string {
+    this.auth.require('trip.run');
+    return this.auth.session()!.veh!;
+  }
+
+  private own(sid: string) {
+    this.auth.require('attendance.set');
+    const s = this.db.students.find((x) => x.id === sid);
+    if (!s || !this.auth.ownsChild(sid)) {
+      throw new Error('Not allowed');
+    }
+    return s;
+  }
+
+  private toggle(sid: string, dir: Direction, st: Ev['st']): void {
+    const v = this.drv();
+    const s = this.db.students.find((x) => x.id === sid);
+    if (!s || s.veh !== v) {
+      throw new Error('Not allowed');
+    }
+    const t = this.trip(v, dir);
+    if (t.status !== 'started') {
+      throw new Error('Start the trip first');
+    }
+    if (this.going[`${sid}:${dir}`] === false) {
+      return;
+    }
+    const i = t.ev.findIndex((e) => e.sid === sid);
+    const same = i >= 0 && t.ev[i].st === st;
+    if (i >= 0) {
+      t.ev.splice(i, 1);
+    }
+    if (!same) {
+      const p = this.stop(s.stop);
+      t.ev.push({ sid, st, at: this.now(), seq: p?.seq ?? 0, stop: p?.name ?? '' });
+    }
   }
 }

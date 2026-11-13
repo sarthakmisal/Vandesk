@@ -1,0 +1,28 @@
+.plan {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+  padding: 18px;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.rev {
+  opacity: 0.6;
+}
+
+.small {
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.empty {
+  text-align: center;
+  padding: 30px;
+  color: #94a3b8;
+}

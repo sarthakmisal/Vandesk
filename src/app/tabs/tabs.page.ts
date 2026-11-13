@@ -1,18 +1,20 @@
-import { Component, EnvironmentInjector, inject } from '@angular/core';
-import { IonTabs, IonTabBar, IonTabButton, IonLabel } from '@ionic/angular';
+import { Component, computed } from '@angular/core';
+import { IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel } from '@ionic/angular';
+import { addIcons } from 'ionicons';
+import { busOutline, peopleOutline, receiptOutline, walletOutline } from 'ionicons/icons';
 
-import { L, T } from '../fees/fees.models';
+import { L, T } from '../core/i18n';
 
 @Component({
   selector: 'app-tabs',
   templateUrl: 'tabs.page.html',
   styleUrls: ['tabs.page.scss'],
-  imports: [IonTabs, IonTabBar, IonTabButton, IonLabel],
+  imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel],
 })
 export class TabsPage {
-  public environmentInjector = inject(EnvironmentInjector);
+  readonly t = computed(() => T[L()]);
 
-  get t(): Record<string, string> {
-    return T[L()];
+  constructor() {
+    addIcons({ walletOutline, peopleOutline, busOutline, receiptOutline });
   }
 }

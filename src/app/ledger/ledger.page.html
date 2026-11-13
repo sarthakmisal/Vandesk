@@ -1,0 +1,39 @@
+<ion-content [fullscreen]="true">
+  <div class="x-wrap">
+    <app-profile-bar />
+    <h1 class="x-h">{{ t().ledger }}</h1>
+
+    <section class="x-card plan">
+      <div class="top">
+        <div>
+          <span class="sub">Monthly fee</span>
+          <div class="msg">{{ current() ? money(current()!.amount) : '—' }}</div>
+          @for (p of upcoming(); track p.id) {
+          <div class="sub">From {{ p.effective_from }}: {{ money(p.amount) }}</div>
+          }
+        </div>
+        <button type="button" class="x-chip" (click)="changeFee()">Change</button>
+      </div>
+      <button type="button" class="x-go alt" (click)="remind()">✉ Send fee reminders</button>
+    </section>
+
+    <div class="x-lb">Payments</div>
+    @for (r of rows(); track r.id) {
+    <article class="x-card" [class.rev]="r.reversed || r.kind === 'reversal'">
+      <div class="x-mid">
+        <b>{{ r.kind === 'reversal' ? '−' : '' }}{{ money(r.amount) }} · {{ r.student }}</b>
+        <span>{{ r.paid_on }} · {{ r.mode.toUpperCase() }}{{ r.note ? ' · ' + r.note : '' }}</span>
+      </div>
+      @if (r.kind === 'reversal') {
+      <span class="x-pill m">Reversal</span>
+      } @else if (r.reversed) {
+      <span class="x-pill m">Reversed</span>
+      } @else {
+      <button type="button" class="x-chip small" (click)="reverse(r)">Reverse</button>
+      }
+    </article>
+    } @empty {
+    <div class="empty">No payments yet.</div>
+    }
+  </div>
+</ion-content>

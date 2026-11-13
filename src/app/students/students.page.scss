@@ -1,0 +1,34 @@
+.seats {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.sv {
+  flex: 1;
+  background: #fff;
+  border: 1px solid #eceef7;
+  border-radius: 18px;
+  padding: 12px 14px;
+
+  div:first-child {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+
+    span {
+      color: #64748b;
+      font-weight: 600;
+    }
+  }
+}
+
+.search {
+  margin-bottom: 14px;
+}
+
+.empty {
+  text-align: center;
+  padding: 30px;
+  color: #94a3b8;
+}

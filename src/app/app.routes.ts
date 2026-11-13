@@ -1,10 +1,10 @@
 import { inject } from '@angular/core';
 import type { Routes } from '@angular/router';
 
-import { AuthService } from './core/auth';
+import { AuthService } from './core/auth.service';
 import { guestGuard, roleGuard } from './core/guards';
 
-// RBAC at the route level: each area only matches for its role; everything else falls to `**`,
+// RBAC at the route level: each area only matches for its role. Anything else falls through to `**`,
 // which sends the user to their own home (or /login). No blank screens, no cross-role URLs.
 export const routes: Routes = [
   {
@@ -27,5 +27,8 @@ export const routes: Routes = [
     canMatch: [roleGuard('admin')],
     loadComponent: () => import('./admin/admin.page').then((m) => m.AdminPage),
   },
-  { path: '**', redirectTo: () => inject(AuthService).home() },
+  {
+    path: '**',
+    redirectTo: () => inject(AuthService).home(),
+  },
 ];

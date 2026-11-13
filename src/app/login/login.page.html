@@ -1,18 +1,57 @@
-<ion-content>
+<ion-content [fullscreen]="true">
   <div class="x-wrap">
     <div class="logo">🚐</div>
-    <h1 class="x-h" style="text-align: center">VanDesk</h1>
-    <p class="sub" style="text-align: center">Demo sign-in. The real app uses an email OTP.</p>
-    @for (g of groups; track g.t) {
+    <h1 class="x-h center">VanDesk</h1>
+
+    @if (mock) {
+    <p class="sub center">Demo mode: pick an account.</p>
+    @for (g of groups(); track g.t) {
     <div class="x-lb">{{ g.t }}</div>
     @for (a of g.list; track a.id) {
-    <button class="x-card acc" (click)="go(a)">
-      <div class="x-av">{{ a.name[0] }}</div>
-      <div class="x-mid"><b>{{ a.name }}</b><span>{{ a.email }}</span></div>
+    <button type="button" class="x-card" (click)="go(a)">
+      <span class="x-av">{{ a.name[0] }}</span>
+      <span class="x-mid">
+        <b>{{ a.name }}</b>
+        <span>{{ a.email }}</span>
+      </span>
       <span class="x-pill">→</span>
     </button>
-    } } @if (err) {
-    <div class="x-err">{{ err }}</div>
+    } } } @else { @if (step() === 'email') {
+    <p class="sub center">Enter your email. We will send you a 6-digit code.</p>
+    <label class="x-lb" for="login-email">Email</label>
+    <input
+      id="login-email"
+      class="x-in"
+      type="email"
+      inputmode="email"
+      autocomplete="email"
+      [value]="email()"
+      (input)="on(email, $event)"
+    />
+    <button type="button" class="x-go alt cta" [disabled]="busy() || !email().includes('@')" (click)="send()">
+      Send code
+    </button>
+    } @else {
+    <p class="sub center">We sent a code to {{ email() }}.</p>
+    <label class="x-lb" for="login-code">6-digit code</label>
+    <input
+      id="login-code"
+      class="x-in code"
+      inputmode="numeric"
+      maxlength="6"
+      autocomplete="one-time-code"
+      [value]="code()"
+      (input)="on(code, $event)"
+    />
+    @if (hint()) {
+    <div class="sub center hint">{{ hint() }}</div>
+    }
+    <button type="button" class="x-go cta" [disabled]="busy() || code().length !== 6" (click)="verify()">
+      Sign in
+    </button>
+    <button type="button" class="lnk" (click)="back()">Use a different email</button>
+    } } @if (err()) {
+    <div class="x-err">{{ err() }}</div>
     }
   </div>
 </ion-content>

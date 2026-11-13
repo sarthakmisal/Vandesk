@@ -1,9 +1,9 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
-  appName: 'lalaj',
-  webDir: 'www'
+  appId: 'com.vandesk.app',
+  appName: 'VanDesk',
+  webDir: 'www',
 };
 
 export default config;

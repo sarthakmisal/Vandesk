@@ -1,12 +1,13 @@
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { IonContent, ModalController, ToastController } from '@ionic/angular';
 
-import { ProfileBarComponent } from '../shared/profile-bar/profile-bar.component';
+import { money } from '../core/format';
+import { L, T } from '../core/i18n';
+import { ProfileBarComponent } from '../profile-bar/profile-bar.component';
 
 import type { Mode, Row } from './fees.models';
-import { L, T, money } from './fees.models';
 import { FeesRepo } from './fees.repo';
-import { PaySheetComponent } from './pay-sheet.component';
+import { PaySheetComponent } from './pay-sheet/pay-sheet.component';
 
 @Component({
   selector: 'app-fees',
@@ -15,75 +16,78 @@ import { PaySheetComponent } from './pay-sheet.component';
   imports: [IonContent, ProfileBarComponent],
 })
 export class FeesPage {
-  private repo = inject(FeesRepo);
-  private modalCtrl = inject(ModalController);
-  private toast = inject(ToastController);
-  private cd = inject(ChangeDetectorRef);
-  rows: Row[] = [];
-  today = 0;
-  loading = true;
-  err = false;
-  m = money;
-  skeleton = [1, 2, 3, 4];
+  private readonly repo = inject(FeesRepo);
+  private readonly modal = inject(ModalController);
+  private readonly toast = inject(ToastController);
 
-  get t(): Record<string, string> {
-    return T[L()];
-  }
-  get pending(): number {
-    return this.rows.reduce((a, r) => a + r.balance, 0);
-  }
-  hue = (s: string): string => `hsl(${[...s].reduce((a, c) => a + c.charCodeAt(0), 0) % 360} 70% 92%)`;
+  readonly rows = signal<Row[]>([]);
+  readonly today = signal(0);
+  readonly loading = signal(true);
+  readonly err = signal(false);
+  readonly pending = computed(() => this.rows().reduce((a, r) => a + r.balance, 0));
+  readonly t = computed(() => T[L()]);
+  readonly money = money;
+  readonly skeleton = [1, 2, 3, 4];
 
+  /** Refresh on every tab visit so newly added students appear. */
   ionViewWillEnter(): void {
-    this.load(); // refresh on every tab visit (new students appear)
+    void this.load();
   }
 
   async load(): Promise<void> {
     try {
-      [this.rows, this.today] = await Promise.all([this.repo.list(), this.repo.collectedToday()]);
-      this.err = false;
+      const [rows, today] = await Promise.all([this.repo.list(), this.repo.collectedToday()]);
+      this.rows.set(rows);
+      this.today.set(today);
+      this.err.set(false);
     } catch {
-      this.err = true;
+      this.err.set(true);
     } finally {
-      this.loading = false;
-      this.cd.markForCheck();
+      this.loading.set(false);
     }
   }
 
-  async open(r: Row): Promise<void> {
-    const m = await this.modalCtrl.create({
+  hue(name: string): string {
+    return `hsl(${[...name].reduce((a, c) => a + c.charCodeAt(0), 0) % 360} 70% 92%)`;
+  }
+
+  async open(row: Row): Promise<void> {
+    const modal = await this.modal.create({
       component: PaySheetComponent,
-      componentProps: { row: r, t: this.t },
+      componentProps: { row },
       breakpoints: [0, 0.8],
       initialBreakpoint: 0.8,
     });
-    await m.present();
-    const { data } = await m.onDidDismiss<{ amount: number; mode: Mode }>();
-    if (data) await this.done(r, data);
+    await modal.present();
+    const { data } = await modal.onDidDismiss<{ amount: number; mode: Mode }>();
+    if (data) {
+      await this.done(row, data);
+    }
   }
 
-  private async done(r: Row, d: { amount: number; mode: Mode }) {
+  private async done(row: Row, d: { amount: number; mode: Mode }): Promise<void> {
     try {
-      const id = await this.repo.record(r.id, d.amount, d.mode);
+      const id = await this.repo.record(row.id, d.amount, d.mode);
       await this.load();
-      const to = await this.toast.create({
-        message: `✓ ${r.name} · ${money(d.amount)}`,
+      const toast = await this.toast.create({
+        message: `✓ ${row.name} · ${money(d.amount)}`,
         duration: 8000,
         position: 'bottom',
         color: 'dark',
         buttons: [
           {
-            text: this.t['undo'],
+            text: this.t().undo,
             handler: async () => {
-              await this.repo.undo(id);
+              await this.repo.reverse(id, 'Undo');
               await this.load();
             },
           },
         ],
       });
-      await to.present();
+      await toast.present();
     } catch (e) {
-      (await this.toast.create({ message: (e as Error).message, duration: 2500, color: 'danger' })).present();
+      const toast = await this.toast.create({ message: (e as Error).message, duration: 2500, color: 'danger' });
+      await toast.present();
     }
   }
 }

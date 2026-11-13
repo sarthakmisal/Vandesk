@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 
-import { AuthService } from '../core/auth';
-import type { Stop } from '../core/mock.db';
-import { MockDb } from '../core/mock.db';
+import { AuthService } from '../core/auth.service';
+import type { Stop } from '../core/mock-db';
+import { MockDb } from '../core/mock-db';
 
 export interface SRow {
   id: string;
@@ -33,18 +33,14 @@ export abstract class StudentsRepo {
   abstract list(): Promise<SRow[]>;
   abstract vehicles(): Promise<VSeat[]>;
   abstract stops(veh: string): Promise<Stop[]>;
-  abstract add(f: NewStudent): Promise<void>; // driver: own vehicle only. Throws Error(message) shown to the user
+  /** Driver: own vehicle only. Throws Error(message) that is shown to the user. */
+  abstract add(f: NewStudent): Promise<void>;
 }
 
 @Injectable()
 export class MockStudentsRepo extends StudentsRepo {
-  private db = inject(MockDb);
-  private auth = inject(AuthService);
-
-  private used = (v: string) => this.db.students.filter((s) => s.veh === v && s.status !== 'left').length;
-  private mine() {
-    return this.db.vehicles.filter((v) => this.auth.session?.role === 'admin' || this.auth.ownsVeh(v.id));
-  }
+  private readonly db = inject(MockDb);
+  private readonly auth = inject(AuthService);
 
   async list(): Promise<SRow[]> {
     this.auth.require('students.read');
@@ -68,25 +64,37 @@ export class MockStudentsRepo extends StudentsRepo {
 
   async stops(veh: string): Promise<Stop[]> {
     this.auth.require('students.read');
-    if (!this.mine().some((v) => v.id === veh)) throw Error('Not allowed');
+    if (!this.mine().some((v) => v.id === veh)) {
+      throw new Error('Not allowed');
+    }
     return this.db.stops.filter((s) => s.veh === veh).sort((a, b) => a.seq - b.seq);
   }
 
   async add(f: NewStudent): Promise<void> {
     this.auth.require('students.add');
-    if (!this.auth.ownsVeh(f.veh)) throw Error('You can only add students to your own vehicle');
-    const name = f.name.trim(),
-      gname = f.gname.trim(),
-      email = f.email.trim().toLowerCase();
-    if (!name || !gname) throw Error('Student and guardian names are required');
-    if (!/^\S+@\S+\.\S+$/.test(email)) throw Error('Enter a valid guardian email');
+    if (!this.auth.ownsVeh(f.veh)) {
+      throw new Error('You can only add students to your own vehicle');
+    }
+    const name = f.name.trim();
+    const gname = f.gname.trim();
+    const email = f.email.trim().toLowerCase();
+    if (!name || !gname) {
+      throw new Error('Student and guardian names are required');
+    }
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      throw new Error('Enter a valid guardian email');
+    }
     const v = this.db.vehicles.find((x) => x.id === f.veh);
-    if (!v) throw Error('Choose a vehicle');
-    if (this.used(v.id) >= v.cap)
-      throw Error(`${v.short} is full (${v.cap} of ${v.cap} seats). Choose another vehicle.`); // R-SEAT-1
+    if (!v) {
+      throw new Error('Choose a vehicle');
+    }
+    if (this.used(v.id) >= v.cap) {
+      throw new Error(`${v.short} is full (${v.cap} of ${v.cap} seats). Choose another vehicle.`); // R-SEAT-1
+    }
     let g = this.db.guardians.find((x) => x.email === email);
-    if (this.db.students.some((s) => s.name.toLowerCase() === name.toLowerCase() && s.gid === g?.id))
-      throw Error('This student is already added');
+    if (this.db.students.some((s) => s.name.toLowerCase() === name.toLowerCase() && s.gid === g?.id)) {
+      throw new Error('This student is already added');
+    }
     if (!g) {
       g = { id: 'g' + ++this.db.n, name: gname, email, phone: f.phone.trim() };
       this.db.guardians.push(g);
@@ -101,5 +109,13 @@ export class MockStudentsRepo extends StudentsRepo {
       status: 'active',
       joined: '2026-10',
     });
+  }
+
+  private used(v: string): number {
+    return this.db.students.filter((s) => s.veh === v && s.status !== 'left').length;
+  }
+
+  private mine() {
+    return this.db.vehicles.filter((v) => this.auth.session()?.role === 'admin' || this.auth.ownsVeh(v.id));
   }
 }

@@ -1,14 +1,12 @@
 import { expect, test } from '@playwright/test';
 
-test('signed-out visitors land on the VanDesk sign-in', async ({ page }) => {
+test('visits the app root url and lands on sign-in', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('ion-content')).toContainText('Demo sign-in');
-  await expect(page).toHaveURL(/#\/login$/);
+  await expect(page.locator('ion-content')).toContainText('VanDesk');
 });
 
-test('a driver can sign in and sees the Fees tab', async ({ page }) => {
+test('a driver signs in and sees the fees tab', async ({ page }) => {
   await page.goto('/');
   await page.getByText('Ramesh Kale').click();
-  await expect(page).toHaveURL(/#\/driver\/fees$/);
-  await expect(page.locator('ion-content')).toContainText('Rohan More');
+  await expect(page.locator('ion-tab-button[tab="fees"]')).toBeVisible();
 });

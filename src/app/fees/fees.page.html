@@ -1,27 +1,35 @@
 <ion-content [fullscreen]="true">
-  <div class="wrap">
-    <app-profile-bar></app-profile-bar>
+  <div class="x-wrap">
+    <app-profile-bar />
+
     <section class="hero">
-      <div class="top">
-        <span class="brand">🚐 {{ t['title'] }}</span>
-      </div>
-      <div class="big">{{ m(pending) }}</div>
-      <div class="sub">{{ t['pending'] }} · {{ rows.length }}</div>
-      <div class="pill">{{ t['today'] }} <b>{{ m(today) }}</b></div>
+      <span class="brand">🚐 {{ t().title }}</span>
+      <div class="big">{{ money(pending()) }}</div>
+      <div class="sub">{{ t().pending }} · {{ rows().length }}</div>
+      <div class="pill">{{ t().today }} <b>{{ money(today()) }}</b></div>
     </section>
 
-    @if (loading) { @for (i of skeleton; track i) {
+    @if (loading()) { @for (i of skeleton; track i) {
     <div class="sk"></div>
-    } } @if (err && !loading) {
-    <div class="err">{{ t['err'] }}<button (click)="load()">{{ t['retry'] }}</button></div>
-    } @for (r of rows; track r.id) {
-    <article class="card" (click)="open(r)" (keydown.enter)="open(r)" tabindex="0" role="button">
-      <div class="av" [style.background]="hue(r.name)">{{ r.name[0] }}</div>
-      <div class="mid"><b>{{ r.name }}</b><span>{{ r.months }} {{ t['months'] }}</span></div>
-      <div class="right"><b>{{ m(r.balance) }}</b><span class="btn">✓ {{ t['received'] }}</span></div>
-    </article>
-    } @if (!loading && !err && !rows.length) {
-    <div class="clear">🎉 {{ t['clear'] }}</div>
+    } } @if (err() && !loading()) {
+    <div class="err">
+      {{ t().err }}
+      <button type="button" (click)="load()">{{ t().retry }}</button>
+    </div>
+    } @for (r of rows(); track r.id) {
+    <button type="button" class="x-card" (click)="open(r)">
+      <span class="x-av" [style.background]="hue(r.name)">{{ r.name[0] }}</span>
+      <span class="x-mid">
+        <b>{{ r.name }}</b>
+        <span>{{ r.months }} {{ t().months }}</span>
+      </span>
+      <span class="right">
+        <b>{{ money(r.balance) }}</b>
+        <span class="btn">✓ {{ t().received }}</span>
+      </span>
+    </button>
+    } @if (!loading() && !err() && rows().length === 0) {
+    <div class="clear">🎉 {{ t().clear }}</div>
     }
   </div>
 </ion-content>

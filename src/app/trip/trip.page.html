@@ -1,36 +1,45 @@
 <ion-content [fullscreen]="true">
   <div class="x-wrap">
-    <app-profile-bar></app-profile-bar>
-    <h1 class="x-h">{{ t['trip'] }}</h1>
-    <div class="ban">
-      {{ st.status === 'idle' ? 'Ready · ' + total + ' students' : st.status === 'started' ? 'Started ' + st.startedAt +
-      ' · ' + done + '/' + total + ' ✓' : '🏫 Reached school ' + st.endedAt }}
+    <app-profile-bar />
+    <h1 class="x-h">{{ t().trip }}</h1>
+
+    <div class="x-seg">
+      <button type="button" [class.on]="dir() === 'pickup'" (click)="setDir('pickup')">🌅 Morning pickup</button>
+      <button type="button" [class.on]="dir() === 'drop'" (click)="setDir('drop')">🌇 Afternoon drop</button>
     </div>
-    @if (st.status === 'idle') {
-    <button class="x-go" (click)="start()">▶ {{ t['start'] }}</button>
-    } @for (r of rows; track r.id) {
+
+    <div class="ban">{{ banner() }}</div>
+
+    @if (st().status === 'idle') {
+    <button type="button" class="x-go go" (click)="start()">▶ {{ t().start }}</button>
+    } @for (r of rows(); track r.id) {
     <article class="x-card" [class.off]="r.state === 'off'">
       <div class="x-av">{{ r.name[0] }}</div>
-      <div class="x-mid"><b>{{ r.name }}</b><span>📍 {{ r.stop }}</span></div>
+      <div class="x-mid">
+        <b>{{ r.name }}</b>
+        <span>📍 {{ r.stop }}</span>
+      </div>
       @if (r.state === 'off') {
-      <span class="x-pill m">{{ t['notComing'] }}</span>
+      <span class="x-pill m">{{ r.late ? '⏰ ' : '' }}{{ t().notComing }}</span>
       } @else {
       <button
+        type="button"
         class="tap"
         [class.ok]="r.state === 'boarded'"
         [class.sk]="r.state === 'skipped'"
-        [disabled]="st.status !== 'started'"
+        [disabled]="st().status !== 'started'"
         (click)="tap(r.id)"
       >
-        {{ r.state === 'boarded' ? '✓ ' + r.at : r.state === 'skipped' ? '✕' : t['picked'] }}
+        {{ label(r) }}
       </button>
-      @if (r.state === 'wait' && st.status === 'started') {
-      <button class="nt" (click)="skip(r.id)" aria-label="Not there">✕</button>
+      @if (r.state === 'wait' && st().status === 'started') {
+      <button type="button" class="nt" aria-label="Not there" (click)="skip(r.id)">✕</button>
       } }
     </article>
-    } @if (st.status === 'started') {
-    <button class="x-go alt" (click)="end()">🏫 {{ t['end'] }}</button>
+    } @if (st().status === 'started') {
+    <button type="button" class="x-go alt go" (click)="end()">🏫 {{ t().end }}</button>
+    } @if (mock) {
+    <button type="button" class="lnk" (click)="reset()">↺ Reset demo</button>
     }
-    <button class="lnk" (click)="reset()">↺ Reset demo</button>
   </div>
 </ion-content>
