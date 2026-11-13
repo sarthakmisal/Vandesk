@@ -594,6 +594,7 @@ export async function tripView(q: Q, u: User, dir: Direction, now: Date) {
       id: r.id,
       name: r.name,
       stop: r.stop,
+      seq: r.seq ?? 99,
       state: r.going === false ? 'off' : (r.kind ?? 'wait'),
       at: istTime(r.at),
       late: !!r.is_late,

@@ -8,7 +8,6 @@
     "start": "ng serve",
     "start:api": "ng serve -c api",
     "build": "ng build",
-    "build:static-mock": "ng build -c static-mock",
     "serve": "node server/index.ts",
     "dev:api": "node --watch server/index.ts",
     "test:api": "node --test server/app.test.ts",

@@ -40,17 +40,6 @@ export const message = (e: unknown): string => {
     if (e.status === 0) {
       return 'No connection. Check your internet.';
     }
-    const raw = e.error as unknown;
-    const htmlResponse =
-      (typeof raw === 'string' && /<!doctype html|<html/i.test(raw)) ||
-      (typeof raw === 'object' &&
-        raw !== null &&
-        'text' in raw &&
-        typeof (raw as { text?: unknown }).text === 'string' &&
-        /<!doctype html|<html/i.test((raw as { text: string }).text));
-    if (htmlResponse) {
-      return 'API endpoint not available. You are likely serving static files without the Node API.';
-    }
     const text = (e.error as { error?: string } | null)?.error;
     return text ?? 'Something went wrong';
   }

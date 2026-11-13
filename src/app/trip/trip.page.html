@@ -1,45 +1,63 @@
-<ion-content [fullscreen]="true">
-  <div class="x-wrap">
+<ion-content [fullscreen]="true" class="drive">
+  <div class="d-wrap">
+    @if (st().status !== 'started') {
     <app-profile-bar />
-    <h1 class="x-h">{{ t().trip }}</h1>
-
     <div class="x-seg">
-      <button type="button" [class.on]="dir() === 'pickup'" (click)="setDir('pickup')">🌅 Morning pickup</button>
-      <button type="button" [class.on]="dir() === 'drop'" (click)="setDir('drop')">🌇 Afternoon drop</button>
+      <button type="button" [class.on]="dir() === 'pickup'" (click)="setDir('pickup')">🌅 {{ t().picked }}</button>
+      <button type="button" [class.on]="dir() === 'drop'" (click)="setDir('drop')">🌇 {{ t().dropped }}</button>
+    </div>
+    } @switch (st().status) { @case ('idle') {
+    <div class="d-panel">
+      <div class="d-big">{{ plan().total }}</div>
+      <div class="d-sub">{{ t().students }}</div>
+      <button type="button" class="d-btn" (click)="start()">▶ {{ t().start }}</button>
+    </div>
+    } @case ('started') {
+    <div class="d-top">
+      <span class="d-count">{{ plan().position }} / {{ plan().total }}</span>
+      <button type="button" class="d-link" (click)="toggleMenu()">☰ {{ t().menu }}</button>
     </div>
 
-    <div class="ban">{{ banner() }}</div>
-
-    @if (st().status === 'idle') {
-    <button type="button" class="x-go go" (click)="start()">▶ {{ t().start }}</button>
-    } @for (r of rows(); track r.id) {
-    <article class="x-card" [class.off]="r.state === 'off'">
-      <div class="x-av">{{ r.name[0] }}</div>
-      <div class="x-mid">
-        <b>{{ r.name }}</b>
-        <span>📍 {{ r.stop }}</span>
+    @if (plan().current; as c) {
+    <div class="d-panel">
+      <div class="d-who">
+        <div class="d-av">{{ c.name[0] }}</div>
+        <div class="d-name">{{ c.name }}</div>
+        <div class="d-stop">📍 {{ c.stop }}</div>
       </div>
-      @if (r.state === 'off') {
-      <span class="x-pill m">{{ r.late ? '⏰ ' : '' }}{{ t().notComing }}</span>
-      } @else {
-      <button
-        type="button"
-        class="tap"
-        [class.ok]="r.state === 'boarded'"
-        [class.sk]="r.state === 'skipped'"
-        [disabled]="st().status !== 'started'"
-        (click)="tap(r.id)"
-      >
-        {{ label(r) }}
+      <button type="button" class="d-btn" (click)="mark(c)">
+        {{ dir() === 'pickup' ? '✓' : '🏠' }} {{ doneLabel() }}
       </button>
-      @if (r.state === 'wait' && st().status === 'started') {
-      <button type="button" class="nt" aria-label="Not there" (click)="skip(r.id)">✕</button>
-      } }
-    </article>
-    } @if (st().status === 'started') {
-    <button type="button" class="x-go alt go" (click)="end()">🏫 {{ t().end }}</button>
-    } @if (mock) {
-    <button type="button" class="lnk" (click)="reset()">↺ Reset demo</button>
-    }
+    </div>
+    <div class="d-foot">
+      @if (plan().next; as n) {
+      <span class="d-next">{{ t().next }}: {{ n.name }}</span>
+      }
+      <div class="d-links">
+        <button type="button" class="d-link" (click)="skip(c)">✕ {{ t().notHere }}</button>
+        @if (last(); as l) {
+        <button type="button" class="d-link" (click)="undo()">↩ {{ t().undo }} {{ l.name }}</button>
+        }
+      </div>
+    </div>
+    } @else {
+    <div class="d-panel">
+      <div class="d-big">✓</div>
+      <div class="d-sub">{{ t().allDone }}</div>
+      <button type="button" class="d-btn end" (click)="end()">🏫 {{ endLabel() }}</button>
+    </div>
+    @if (last(); as l) {
+    <div class="d-links">
+      <button type="button" class="d-link" (click)="undo()">↩ {{ t().undo }} {{ l.name }}</button>
+    </div>
+    } } } @case ('ended') {
+    <div class="d-panel">
+      <div class="d-big">✓</div>
+      <div class="d-sub">{{ endLabel() }} · {{ st().endedAt }}</div>
+      <div class="d-sum">{{ plan().done }} ✓ @if (plan().skipped) { · {{ plan().skipped }} ✕ }</div>
+    </div>
+    @if (mock) {
+    <button type="button" class="d-link center" (click)="reset()">↺ Reset demo</button>
+    } } }
   </div>
 </ion-content>

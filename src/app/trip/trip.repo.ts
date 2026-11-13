@@ -10,6 +10,8 @@ export interface TRow {
   id: string;
   name: string;
   stop: string;
+  /** Position of the student's stop on the route (1 = first stop). */
+  seq: number;
   state: RState;
   at?: string;
   /** Parent changed to Not going after the cutoff (driver sees a badge). */
@@ -83,7 +85,10 @@ export class MockTripRepo extends TripRepo {
         const e = t.ev.find((x) => x.sid === s.id);
         const st = this.stop(s.stop);
         const state: RState = this.going[`${s.id}:${dir}`] === false ? 'off' : e ? e.st : 'wait';
-        return { row: { id: s.id, name: s.name, stop: st?.name ?? '', state, at: e?.at }, seq: st?.seq ?? 99 };
+        return {
+          row: { id: s.id, name: s.name, stop: st?.name ?? '', seq: st?.seq ?? 99, state, at: e?.at },
+          seq: st?.seq ?? 99,
+        };
       })
       .sort((a, b) => sign * (a.seq - b.seq) || a.row.name.localeCompare(b.row.name)) // route order (R-TRIP-2)
       .map((x) => x.row);

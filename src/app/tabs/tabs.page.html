@@ -1,5 +1,10 @@
 <ion-tabs>
-  <ion-tab-bar slot="bottom">
+  <ion-tab-bar slot="bottom" [class.hidden]="driving.on()">
+    <ion-tab-button tab="trip" href="/driver/trip">
+      <ion-icon aria-hidden="true" name="bus-outline"></ion-icon>
+      <ion-label>{{ t().trip }}</ion-label>
+    </ion-tab-button>
+
     <ion-tab-button tab="fees" href="/driver/fees">
       <ion-icon aria-hidden="true" name="wallet-outline"></ion-icon>
       <ion-label>{{ t().title }}</ion-label>
@@ -8,11 +13,6 @@
     <ion-tab-button tab="students" href="/driver/students">
       <ion-icon aria-hidden="true" name="people-outline"></ion-icon>
       <ion-label>{{ t().students }}</ion-label>
-    </ion-tab-button>
-
-    <ion-tab-button tab="trip" href="/driver/trip">
-      <ion-icon aria-hidden="true" name="bus-outline"></ion-icon>
-      <ion-label>{{ t().trip }}</ion-label>
     </ion-tab-button>
 
     <ion-tab-button tab="ledger" href="/driver/ledger">

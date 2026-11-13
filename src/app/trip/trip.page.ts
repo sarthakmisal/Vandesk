@@ -1,64 +1,73 @@
+import type { OnDestroy } from '@angular/core';
 import { Component, computed, inject, signal } from '@angular/core';
 import { IonContent, ToastController } from '@ionic/angular';
 
 import { environment } from '../../environments/environment';
 import type { Direction } from '../core/direction';
 import { defaultDirection } from '../core/direction';
+import { DrivingMode } from '../core/driving-mode';
 import { Geo } from '../core/geo';
 import { L, T } from '../core/i18n';
 import { ProfileBarComponent } from '../profile-bar/profile-bar.component';
 
+import { planTrip } from './next-student';
 import type { TRow, TState } from './trip.repo';
 import { TripRepo } from './trip.repo';
 
-/** Driver flow: Start trip, one tap per student (location captured at the tap), Reached school. Morning = pickup, afternoon = drop. */
+/**
+ * Driver screen for a phone on a stand. One student at a time, one big button.
+ * Morning = pickup (stops in route order), afternoon = drop (route in reverse). The next student appears by itself (see next-student.ts).
+ */
 @Component({
   selector: 'app-trip',
   templateUrl: 'trip.page.html',
   styleUrls: ['trip.page.scss'],
   imports: [IonContent, ProfileBarComponent],
 })
-export class TripPage {
+export class TripPage implements OnDestroy {
   private readonly repo = inject(TripRepo);
   private readonly toast = inject(ToastController);
   private readonly geo = inject(Geo);
+  private readonly driving = inject(DrivingMode);
 
   readonly mock = environment.useMock;
   readonly dir = signal<Direction>(defaultDirection());
   readonly rows = signal<TRow[]>([]);
   readonly st = signal<TState>({ status: 'idle' });
+  readonly menu = signal(false); // driver chose to see the tab bar while a trip is running
+  readonly last = signal<{ id: string; name: string; kind: 'boarded' | 'skipped' } | undefined>(undefined);
   readonly t = computed(() => T[L()]);
-  readonly done = computed(() => this.rows().filter((r) => r.state === 'boarded').length);
-  readonly total = computed(() => this.rows().filter((r) => r.state !== 'off').length);
-  readonly banner = computed(() => {
-    const s = this.st();
-    if (s.status === 'idle') {
-      return `Ready · ${this.total()} students`;
-    }
-    return s.status === 'started'
-      ? `Started ${s.startedAt} · ${this.done()}/${this.total()} ✓`
-      : `🏫 ${this.dir() === 'pickup' ? 'Reached school' : 'Finished'} ${s.endedAt}`;
-  });
+  readonly plan = computed(() => planTrip(this.rows(), this.dir()));
+  readonly doneLabel = computed(() => (this.dir() === 'pickup' ? this.t().picked : this.t().dropped));
+  readonly endLabel = computed(() => (this.dir() === 'pickup' ? this.t().end : this.t().finish));
 
   ionViewWillEnter(): void {
     void this.load();
   }
 
+  ionViewWillLeave(): void {
+    this.driving.on.set(false);
+  }
+
+  ngOnDestroy(): void {
+    this.driving.on.set(false);
+  }
+
   async load(): Promise<void> {
     this.rows.set(await this.repo.roster(this.dir()));
     this.st.set(await this.repo.state(this.dir()));
+    this.driving.on.set(this.st().status === 'started' && !this.menu());
   }
 
   setDir(d: Direction): void {
     this.dir.set(d);
+    this.last.set(undefined);
     void this.load();
   }
 
-  label(r: TRow): string {
-    if (r.state === 'boarded') {
-      return '✓ ' + r.at;
-    }
-    return r.state === 'skipped' ? '✕' : this.dir() === 'pickup' ? this.t().picked : '🏠 Dropped';
+  toggleMenu(): void {
+    this.menu.update((m) => !m);
+    this.driving.on.set(this.st().status === 'started' && !this.menu());
   }
 
   start(): Promise<void> {
@@ -66,16 +75,38 @@ export class TripPage {
   }
 
   end(): Promise<void> {
-    return this.run(() => this.repo.end(this.dir()));
+    return this.run(async () => {
+      await this.repo.end(this.dir());
+      this.last.set(undefined);
+    });
   }
 
-  /** The tap is never held up for GPS: wait at most ~1.5 s for a fix, then send with or without it. */
-  tap(id: string): Promise<void> {
-    return this.run(async () => this.repo.tap(id, this.dir(), this.mock ? undefined : await this.geo.fix()));
+  /** The one big button. The tap is never held up for GPS: wait at most ~1.5 s for a fix, then send with or without it. */
+  mark(r: TRow): Promise<void> {
+    return this.run(async () => {
+      await this.repo.tap(r.id, this.dir(), this.mock ? undefined : await this.geo.fix());
+      this.last.set({ id: r.id, name: r.name, kind: 'boarded' });
+      navigator.vibrate?.(40); // small buzz so the driver knows it registered without looking
+    });
   }
 
-  skip(id: string): Promise<void> {
-    return this.run(() => this.repo.notThere(id, this.dir()));
+  /** Small link: the student is not at the stop. */
+  skip(r: TRow): Promise<void> {
+    return this.run(async () => {
+      await this.repo.notThere(r.id, this.dir());
+      this.last.set({ id: r.id, name: r.name, kind: 'skipped' });
+    });
+  }
+
+  /** Small link: tapped by mistake. Tapping the same student again reverses it, and they come back as the current student. */
+  undo(): Promise<void> {
+    const l = this.last();
+    return this.run(async () => {
+      if (l) {
+        await (l.kind === 'boarded' ? this.repo.tap(l.id, this.dir()) : this.repo.notThere(l.id, this.dir()));
+      }
+      this.last.set(undefined);
+    });
   }
 
   reset(): Promise<void> {

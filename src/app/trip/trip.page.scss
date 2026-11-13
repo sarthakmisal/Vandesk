@@ -1,59 +1,154 @@
-.ban {
-  background: linear-gradient(135deg, #e0e3ff, #fff);
-  border: 1px solid #e6e8f5;
-  border-radius: 20px;
-  padding: 14px 18px;
+/* Phone on a stand: huge text, one primary button, no clutter. Works upright and sideways. */
+.d-wrap {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: calc(14px + env(safe-area-inset-top, 0px)) 16px calc(16px + env(safe-area-inset-bottom, 0px));
+}
+
+.d-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.d-count {
+  font-size: 22px;
+  font-weight: 800;
+  color: #4f46e5;
+}
+
+.d-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+  text-align: center;
+}
+
+.d-who {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  border-radius: 28px;
+  padding: 18px;
+}
+
+.d-av {
+  width: clamp(72px, 16vw, 120px);
+  height: clamp(72px, 16vw, 120px);
+  border-radius: 28px;
+  display: grid;
+  place-items: center;
+  font-size: clamp(40px, 9vw, 72px);
+  font-weight: 800;
+  color: #4f46e5;
+  background: #eef0ff;
+}
+
+.d-name {
+  font-size: clamp(34px, 9vw, 64px);
+  font-weight: 800;
+  line-height: 1.1;
+  color: #0f172a;
+}
+
+.d-stop {
+  font-size: clamp(20px, 5vw, 32px);
   font-weight: 700;
-  color: #1e1b4b;
-  margin-bottom: 14px;
-}
-
-.go {
-  margin: 6px 0 14px;
-}
-
-.off {
-  opacity: 0.55;
-}
-
-.tap {
-  border: 0;
-  border-radius: 16px;
-  min-width: 104px;
-  padding: 14px 12px;
-  font-weight: 800;
-  font-size: 15px;
-  color: #fff;
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
-
-  &.ok {
-    background: linear-gradient(135deg, #10b981, #059669);
-  }
-
-  &.sk {
-    background: #cbd5e1;
-  }
-
-  &[disabled] {
-    opacity: 0.45;
-  }
-}
-
-.nt {
-  border: 0;
-  background: #f1f5f9;
-  border-radius: 12px;
-  width: 36px;
-  height: 36px;
   color: #64748b;
-  font-weight: 800;
 }
 
-.lnk {
-  display: block;
-  margin: 10px auto;
+.d-big {
+  font-size: clamp(64px, 18vw, 140px);
+  font-weight: 800;
+  color: #4f46e5;
+  line-height: 1;
+}
+
+.d-sub {
+  font-size: clamp(20px, 5vw, 30px);
+  font-weight: 700;
+  color: #475569;
+}
+
+.d-sum {
+  font-size: 26px;
+  font-weight: 800;
+  color: #059669;
+}
+
+.d-btn {
+  width: 100%;
+  min-height: clamp(110px, 24vh, 200px);
+  border: 0;
+  border-radius: 32px;
+  font-size: clamp(34px, 9vw, 60px);
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(135deg, #10b981, #059669);
+  box-shadow: 0 22px 40px -16px rgba(5, 150, 105, 0.65);
+
+  &.end {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    box-shadow: 0 22px 40px -16px rgba(79, 70, 229, 0.6);
+  }
+}
+
+.d-foot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding-top: 14px;
+}
+
+.d-next {
+  font-size: 18px;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.d-links {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.d-link {
   border: 0;
   background: none;
-  color: #94a3b8;
-  font-weight: 600;
+  padding: 10px 14px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #64748b;
+
+  &.center {
+    display: block;
+    margin: 14px auto 0;
+  }
+}
+
+/* sideways on a stand: student on the left, the big button on the right */
+@media (orientation: landscape) and (max-height: 520px) {
+  .d-panel {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .d-who,
+  .d-btn {
+    flex: 1;
+    min-height: 0;
+  }
 }

@@ -25,7 +25,7 @@ export const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: '/driver/fees',
+        redirectTo: '/driver/trip',
         pathMatch: 'full',
       },
     ],

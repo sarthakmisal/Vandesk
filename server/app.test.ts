@@ -251,6 +251,7 @@ describe('trips', () => {
     const view = (await call(T['van'], 'GET', '/trip?direction=pickup')).body;
     assert.equal(view['state']['status'], 'started');
     assert.equal(view['roster'][0]['stop'], 'Hanuman Mandir');
+    assert.equal(view['roster'][0]['seq'], 1);
     assert.equal(view['roster'].find((r: Json) => r['id'] === 's2')['state'], 'off');
     await call(T['van'], 'POST', '/trip/tap', {
       studentId: 's1',

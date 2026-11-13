@@ -26,6 +26,12 @@ export interface Strings {
   search: string;
   notGoing: string;
   ledger: string;
+  dropped: string;
+  notHere: string;
+  allDone: string;
+  finish: string;
+  next: string;
+  menu: string;
 }
 
 export const T: Record<Lang, Strings> = {
@@ -53,6 +59,12 @@ export const T: Record<Lang, Strings> = {
     search: 'Search',
     notGoing: 'Not going today',
     ledger: 'Ledger',
+    dropped: 'Dropped',
+    notHere: 'Not here',
+    allDone: 'All students done',
+    finish: 'Finish trip',
+    next: 'Next',
+    menu: 'Menu',
   },
   hi: {
     title: 'फीस',
@@ -78,6 +90,12 @@ export const T: Record<Lang, Strings> = {
     search: 'खोजें',
     notGoing: 'आज नहीं जाएगा',
     ledger: 'खाता',
+    dropped: 'छोड़ दिया',
+    notHere: 'नहीं मिला',
+    allDone: 'सभी बच्चे हो गए',
+    finish: 'ट्रिप खत्म',
+    next: 'अगला',
+    menu: 'मेन्यू',
   },
   mr: {
     title: 'फी',
@@ -103,6 +121,12 @@ export const T: Record<Lang, Strings> = {
     search: 'शोधा',
     notGoing: 'आज जाणार नाही',
     ledger: 'खाते',
+    dropped: 'सोडले',
+    notHere: 'नाही भेटला',
+    allDone: 'सर्व विद्यार्थी झाले',
+    finish: 'ट्रिप संपली',
+    next: 'पुढचा',
+    menu: 'मेनू',
   },
 };
 

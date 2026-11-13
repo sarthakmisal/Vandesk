@@ -79,27 +79,6 @@
                   "with": "src/environments/environment.api.ts"
                 }
               ]
-            },
-            "static-mock": {
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "2mb",
-                  "maximumError": "5mb"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
-                }
-              ],
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.static.ts"
-                }
-              ],
-              "outputHashing": "all"
             }
           },
           "defaultConfiguration": "production"
@@ -119,9 +98,6 @@
             "api": {
               "buildTarget": "app:build:api",
               "proxyConfig": "proxy.conf.json"
-            },
-            "static-mock": {
-              "buildTarget": "app:build:static-mock"
             }
           },
           "defaultConfiguration": "development"
