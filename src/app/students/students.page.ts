@@ -1,8 +1,10 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { IonContent, IonFab, ModalController, ToastController } from '@ionic/angular';
+import { IonContent, ModalController } from '@ionic/angular';
 
 import { L, T } from '../core/i18n';
 import { ProfileBarComponent } from '../profile-bar/profile-bar.component';
+import { IconComponent } from '../ui/icon.component';
+import { Toast } from '../ui/toast.service';
 
 import { AddStudentComponent } from './add-student/add-student.component';
 import type { SRow, VSeat } from './students.repo';
@@ -12,12 +14,12 @@ import { StudentsRepo } from './students.repo';
   selector: 'app-students',
   templateUrl: 'students.page.html',
   styleUrls: ['students.page.scss'],
-  imports: [IonContent, IonFab, ProfileBarComponent],
+  imports: [IonContent, ProfileBarComponent, IconComponent],
 })
 export class StudentsPage {
   private readonly repo = inject(StudentsRepo);
   private readonly modal = inject(ModalController);
-  private readonly toast = inject(ToastController);
+  private readonly toast = inject(Toast);
 
   readonly rows = signal<SRow[]>([]);
   readonly veh = signal<VSeat[]>([]);
@@ -47,6 +49,7 @@ export class StudentsPage {
     const modal = await this.modal.create({
       component: AddStudentComponent,
       componentProps: { repo: this.repo },
+      cssClass: 'vd-sheet',
       breakpoints: [0, 0.95],
       initialBreakpoint: 0.95,
     });
@@ -54,8 +57,7 @@ export class StudentsPage {
     const { data } = await modal.onDidDismiss<string>();
     if (data) {
       await this.load();
-      const toast = await this.toast.create({ message: '✓ ' + data, duration: 2500, color: 'dark' });
-      await toast.present();
+      this.toast.show(data + ' added');
     }
   }
 }

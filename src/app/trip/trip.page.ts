@@ -1,6 +1,6 @@
 import type { OnDestroy } from '@angular/core';
 import { Component, computed, inject, signal } from '@angular/core';
-import { IonContent, ToastController } from '@ionic/angular';
+import { IonContent } from '@ionic/angular';
 
 import { environment } from '../../environments/environment';
 import type { Direction } from '../core/direction';
@@ -9,6 +9,8 @@ import { DrivingMode } from '../core/driving-mode';
 import { Geo } from '../core/geo';
 import { L, T } from '../core/i18n';
 import { ProfileBarComponent } from '../profile-bar/profile-bar.component';
+import { IconComponent } from '../ui/icon.component';
+import { Toast } from '../ui/toast.service';
 
 import { planTrip } from './next-student';
 import type { TRow, TState } from './trip.repo';
@@ -22,11 +24,11 @@ import { TripRepo } from './trip.repo';
   selector: 'app-trip',
   templateUrl: 'trip.page.html',
   styleUrls: ['trip.page.scss'],
-  imports: [IonContent, ProfileBarComponent],
+  imports: [IonContent, ProfileBarComponent, IconComponent],
 })
 export class TripPage implements OnDestroy {
   private readonly repo = inject(TripRepo);
-  private readonly toast = inject(ToastController);
+  private readonly toast = inject(Toast);
   private readonly geo = inject(Geo);
   private readonly driving = inject(DrivingMode);
 
@@ -38,6 +40,10 @@ export class TripPage implements OnDestroy {
   readonly last = signal<{ id: string; name: string; kind: 'boarded' | 'skipped' } | undefined>(undefined);
   readonly t = computed(() => T[L()]);
   readonly plan = computed(() => planTrip(this.rows(), this.dir()));
+  readonly pct = computed(() => {
+    const p = this.plan();
+    return p.total ? ((p.done + p.skipped) / p.total) * 100 : 0;
+  });
   readonly doneLabel = computed(() => (this.dir() === 'pickup' ? this.t().picked : this.t().dropped));
   readonly endLabel = computed(() => (this.dir() === 'pickup' ? this.t().end : this.t().finish));
 
@@ -117,8 +123,7 @@ export class TripPage implements OnDestroy {
     try {
       await f();
     } catch (e) {
-      const toast = await this.toast.create({ message: (e as Error).message, duration: 2600, color: 'dark' });
-      await toast.present();
+      this.toast.error((e as Error).message);
     }
     await this.load();
   }

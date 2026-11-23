@@ -4,6 +4,7 @@ import { IonContent, ModalController } from '@ionic/angular';
 
 import { L, T } from '../../core/i18n';
 import type { Stop } from '../../core/mock-db';
+import { IconComponent } from '../../ui/icon.component';
 import type { NewStudent, StudentsRepo, VSeat } from '../students.repo';
 
 type Field = 'name' | 'cls' | 'gname' | 'email' | 'phone';
@@ -13,12 +14,13 @@ type Field = 'name' | 'cls' | 'gname' | 'email' | 'phone';
   selector: 'app-add-student',
   templateUrl: './add-student.component.html',
   styleUrls: ['./add-student.component.scss'],
-  imports: [IonContent],
+  imports: [IonContent, IconComponent],
 })
 export class AddStudentComponent implements OnInit {
   @Input({ required: true }) repo!: StudentsRepo; // passed in: modals use the root injector
 
-  private readonly modal = inject(ModalController);
+  // NB: never name this `modal`: Ionic reserves that property on components shown inside ion-modal.
+  private readonly modalCtrl = inject(ModalController);
 
   readonly t = signal(T[L()]);
   readonly veh = signal<VSeat[]>([]);
@@ -53,7 +55,7 @@ export class AddStudentComponent implements OnInit {
     const f: NewStudent = { ...this.form, veh: this.selVeh(), stop: this.selStop() };
     try {
       await this.repo.add(f);
-      await this.modal.dismiss(f.name.trim());
+      await this.modalCtrl.dismiss(f.name.trim());
     } catch (e) {
       this.err.set((e as Error).message);
     }

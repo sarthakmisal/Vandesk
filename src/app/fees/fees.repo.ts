@@ -177,7 +177,21 @@ export class MockFeesRepo extends FeesRepo {
 
   async addPlan(amount: number, from: string): Promise<void> {
     this.auth.require('fees.record');
-    const veh = this.auth.session()!.veh!;
+    this.pushPlan(this.auth.session()!.veh!, amount, from);
+  }
+
+  /** Admin (mock): any vehicle. The real API does the same on POST /admin/vehicles/:id/fee-plans. */
+  setFee(veh: string, amount: number, from: string): void {
+    this.auth.require('fees.plan');
+    this.pushPlan(veh, amount, from);
+  }
+
+  /** Monthly fee in force today for a vehicle (paise), or 0 when none is set. */
+  feeNow(veh: string): number {
+    return this.amountFor(veh, this.TODAY.slice(0, 7));
+  }
+
+  private pushPlan(veh: string, amount: number, from: string): void {
     if (!(amount > 0) || !from) {
       throw new Error('Enter amount and date');
     }

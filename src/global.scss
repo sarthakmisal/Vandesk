@@ -1,145 +1,282 @@
-/*
- * App Global CSS
- * ----------------------------------------------------------------------------
- * Put style rules here that you want to apply globally. These styles are for
- * the entire app and not just one component. Additionally, this file can be
- * used as an entry point to import other CSS/Sass files to be included in the
- * output CSS.
- * For more information on global stylesheets, visit the documentation:
- * https://ionicframework.com/docs/layout/global-stylesheets
- */
-
-/* Core CSS required for Ionic components to work properly */
+/* Ionic core only: no padding/float/flex/text utility classes (the app does not use them). */
 @import '@ionic/angular/css/core.css';
-
-/* Basic CSS for apps built with Ionic */
 @import '@ionic/angular/css/normalize.css';
 @import '@ionic/angular/css/structure.css';
-@import '@ionic/angular/css/typography.css';
-@import '@ionic/angular/css/display.css';
 
-/* Optional CSS utils that can be commented out */
-@import '@ionic/angular/css/padding.css';
-@import '@ionic/angular/css/float-elements.css';
-@import '@ionic/angular/css/text-alignment.css';
-@import '@ionic/angular/css/text-transformation.css';
-@import '@ionic/angular/css/flex-utils.css';
+/* The app is light-only on purpose: high contrast for drivers in daylight. */
 
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
 
-/* @import "@ionic/angular/css/palettes/dark.always.css"; */
-/* @import "@ionic/angular/css/palettes/dark.class.css"; */
-/* The app is light-only by design (high contrast for drivers), so no dark palette is imported. */
-/* @import '@ionic/angular/css/palettes/dark.system.css'; */
+html {
+  background: var(--vd-bg);
+}
 
-/**
- * VanDesk shared UI
- * -----------------------------------------------------
- * Small set of reusable classes (prefix x-) used by every page. Page-specific styles live next to each page.
- */
+body {
+  font-family: var(--ion-font-family);
+  font-size: 15px;
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
 ion-content {
-  --background: #f5f6fb;
+  --background: var(--vd-bg);
 }
 
-.x-wrap {
-  max-width: 720px;
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: 0;
+  background: none;
+  padding: 0;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--vd-brand);
+  outline-offset: 2px;
+}
+
+/* ---------- layout ---------- */
+.vd-page {
+  max-width: 680px;
   margin: 0 auto;
-  padding: 16px 16px 120px;
-  padding-top: calc(16px + env(safe-area-inset-top, 0px));
+  padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 40px;
 }
 
-.x-h {
-  margin: 6px 4px 14px;
-  font-size: 26px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  color: #1e1b4b;
+.vd-h1 {
+  margin: 18px 2px 4px;
+  font-size: 28px;
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.025em;
 }
 
-.x-card {
+.vd-muted {
+  color: var(--vd-ink-3);
+  font-size: 13px;
+}
+
+.vd-label {
+  display: block;
+  margin: 18px 2px 8px;
+  color: var(--vd-ink-3);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.vd-err {
+  margin: 12px 2px 0;
+  color: var(--vd-danger);
+  font-weight: 600;
+}
+
+.vd-empty {
+  padding: 36px 16px;
+  text-align: center;
+  color: var(--vd-ink-3);
+}
+
+/* ---------- surfaces ---------- */
+.vd-card,
+.vd-list {
+  background: var(--vd-surface);
+  border: 1px solid var(--vd-line);
+  border-radius: var(--vd-r-l);
+  box-shadow: var(--vd-shadow);
+}
+
+.vd-card {
+  padding: 18px;
+  margin-bottom: 14px;
+}
+
+.vd-list {
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+
+.vd-item {
   display: flex;
   align-items: center;
   gap: 12px;
   width: 100%;
-  background: #fff;
-  border: 1px solid #eceef7;
-  border-radius: 22px;
-  padding: 14px 16px;
-  margin-bottom: 12px;
-  min-height: 76px;
-  box-shadow: 0 10px 24px -16px rgba(30, 27, 75, 0.35);
-  font: inherit;
-  color: inherit;
+  padding: 13px 16px;
   text-align: left;
-}
+  border-top: 1px solid var(--vd-line);
 
-button.x-card {
-  cursor: pointer;
-  transition: transform 0.12s ease;
-
-  &:active {
-    transform: scale(0.985);
+  &:first-child {
+    border-top: 0;
   }
 }
 
-.x-av {
-  width: 48px;
-  height: 48px;
-  border-radius: 16px;
-  display: grid;
-  place-items: center;
-  font-weight: 800;
-  font-size: 18px;
-  color: #4f46e5;
-  background: #eef0ff;
-  flex: none;
+button.vd-item:active {
+  background: var(--vd-bg);
 }
 
-.x-mid {
+.vd-mid {
   flex: 1;
   min-width: 0;
 
-  b {
+  b,
+  span {
     display: block;
-    font-size: 17px;
-    color: #0f172a;
-    white-space: nowrap;
     overflow: hidden;
+    white-space: nowrap;
     text-overflow: ellipsis;
   }
 
+  b {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
   span {
-    color: #94a3b8;
+    color: var(--vd-ink-3);
     font-size: 13px;
-    font-weight: 500;
   }
 }
 
-.x-chips {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 14px;
+.vd-avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--vd-brand-soft);
+  color: var(--vd-brand);
+  font-weight: 700;
 }
 
-.x-chip {
-  border: 2px solid #e6e8f5;
-  background: #fff;
-  border-radius: 16px;
-  padding: 11px 16px;
-  font-weight: 700;
-  font-size: 15px;
-  color: #475569;
+/* ---------- controls ---------- */
+.vd-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: var(--vd-r-m);
+  background: var(--vd-brand);
+  color: #fff;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: transform 0.12s ease, background 0.12s ease;
+
+  &:active {
+    transform: scale(0.98);
+    background: var(--vd-brand-2);
+  }
+
+  &.block {
+    width: 100%;
+  }
+
+  &.lg {
+    min-height: 54px;
+    font-size: 17px;
+  }
+
+  &.soft {
+    background: var(--vd-brand-soft);
+    color: var(--vd-brand);
+  }
+
+  &.ink {
+    background: var(--vd-ink);
+  }
+
+  &.ghost {
+    background: none;
+    color: var(--vd-ink-2);
+    border: 1px solid var(--vd-line);
+  }
+
+  &.sm {
+    min-height: 34px;
+    padding: 0 12px;
+    font-size: 13px;
+    border-radius: 99px;
+  }
+
+  &[disabled] {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+}
+
+.vd-input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--vd-line);
+  border-radius: var(--vd-r-m);
+  background: var(--vd-surface);
+  font-size: 16px;
+
+  &:focus {
+    border-color: var(--vd-brand);
+    outline: 0;
+    box-shadow: 0 0 0 3px var(--vd-brand-soft);
+  }
+}
+
+.vd-seg {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 14px;
+  border-radius: var(--vd-r-m);
+  background: #ebe9e4;
+
+  button {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 40px;
+    border-radius: var(--vd-r-s);
+    color: var(--vd-ink-2);
+    font-weight: 600;
+
+    &.on {
+      background: var(--vd-surface);
+      color: var(--vd-ink);
+      box-shadow: 0 1px 3px rgb(20 22 26 / 12%);
+    }
+  }
+}
+
+.vd-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.vd-chip {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--vd-line);
+  border-radius: 99px;
+  background: var(--vd-surface);
+  color: var(--vd-ink-2);
+  font-weight: 600;
 
   &.on {
-    border-color: #4f46e5;
-    background: #eef0ff;
-    color: #4f46e5;
+    border-color: var(--vd-brand);
+    background: var(--vd-brand-soft);
+    color: var(--vd-brand);
   }
 
   &[disabled] {
@@ -148,197 +285,182 @@ button.x-card {
 
   small {
     display: block;
+    margin-top: -2px;
+    font-size: 11px;
     font-weight: 500;
-    color: #94a3b8;
-    font-size: 12px;
+    color: var(--vd-ink-3);
   }
 }
 
-.x-go {
-  width: 100%;
-  border: 0;
-  border-radius: 20px;
-  padding: 19px;
-  font-size: 18px;
-  font-weight: 800;
-  color: #fff;
-  background: linear-gradient(135deg, #10b981, #059669);
-  box-shadow: 0 14px 28px -12px rgba(5, 150, 105, 0.6);
-
-  &.alt {
-    background: linear-gradient(135deg, #4f46e5, #7c3aed);
-    box-shadow: 0 14px 28px -12px rgba(79, 70, 229, 0.55);
-  }
-
-  &[disabled] {
-    opacity: 0.4;
-  }
-
-  &.add {
-    width: auto;
-    padding: 16px 26px;
-    margin-bottom: 14px;
-  }
-}
-
-.x-in {
-  width: 100%;
-  border: 2px solid #e6e8f5;
-  border-radius: 14px;
-  padding: 14px;
-  font-size: 17px;
-  background: #fff;
-  color: #0f172a;
-}
-
-.x-lb {
-  display: block;
-  margin: 14px 2px 6px;
-  color: #64748b;
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.x-pill {
+.vd-pill {
   display: inline-block;
-  padding: 4px 12px;
+  padding: 3px 10px;
   border-radius: 99px;
+  background: var(--vd-brand-soft);
+  color: var(--vd-brand);
   font-size: 12px;
-  font-weight: 700;
-  background: #eef0ff;
-  color: #4f46e5;
+  font-weight: 600;
 
-  &.m {
-    background: #f1f5f9;
-    color: #94a3b8;
+  &.mute {
+    background: #efeeea;
+    color: var(--vd-ink-3);
+  }
+
+  &.warn {
+    background: var(--vd-amber-soft);
+    color: var(--vd-amber-ink);
   }
 }
 
-.x-seg {
-  display: flex;
-  background: #fff;
-  border: 1px solid #e6e8f5;
-  border-radius: 16px;
-  padding: 4px;
-  margin-bottom: 14px;
-
-  button {
-    flex: 1;
-    border: 0;
-    background: none;
-    border-radius: 12px;
-    padding: 11px;
-    font-weight: 700;
-    color: #64748b;
-
-    &.on {
-      background: #4f46e5;
-      color: #fff;
-    }
-  }
-}
-
-.x-pr {
-  height: 8px;
+.vd-bar {
+  height: 6px;
   border-radius: 9px;
-  background: #e6e8f5;
+  background: #ebe9e4;
   overflow: hidden;
 
   i {
     display: block;
     height: 100%;
-    background: linear-gradient(90deg, #4f46e5, #7c3aed);
+    border-radius: 9px;
+    background: var(--vd-brand);
+    transition: width 0.3s ease;
 
     &.full {
-      background: #dc2626;
+      background: var(--vd-danger);
     }
   }
 }
 
-.x-err {
-  color: #dc2626;
-  font-weight: 600;
-  margin: 12px 2px 0;
-}
-
-/* status card + stops timeline (parent view) */
-.pc {
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-  padding: 18px;
-}
-
-.msg {
-  font-size: 20px;
-  font-weight: 800;
-  color: #1e1b4b;
-}
-
-.sub {
-  color: #64748b;
-  font-size: 14px;
-}
-
-.tl {
-  background: #fff;
-  border: 1px solid #eceef7;
-  border-radius: 22px;
-  padding: 6px 18px;
+/* ---------- parent timeline ---------- */
+.vd-tl {
+  padding: 4px 18px;
   margin-bottom: 14px;
 }
 
-.st {
+.vd-st {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 13px 0;
-  color: #94a3b8;
-  font-weight: 600;
-  border-top: 1px solid #f1f2f8;
+  padding: 12px 0;
+  border-top: 1px solid var(--vd-line);
+  color: var(--vd-ink-3);
+  font-weight: 500;
 
   &:first-child {
     border: 0;
   }
 
   i {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    border: 3px solid #cbd5e1;
     flex: none;
-    background: #fff;
+    width: 12px;
+    height: 12px;
+    border: 2px solid #cfcdc6;
+    border-radius: 50%;
   }
 
   span {
     flex: 1;
   }
 
-  small {
-    font-weight: 600;
-  }
-
   &.done {
-    color: #0f172a;
+    color: var(--vd-ink);
 
     i {
-      border-color: #10b981;
-      background: #10b981;
+      border-color: var(--vd-brand);
+      background: var(--vd-brand);
     }
   }
 
   &.me span {
-    color: #4f46e5;
+    color: var(--vd-brand);
+    font-weight: 600;
+  }
+}
+
+/* ---------- Ionic overlays ---------- */
+ion-toast {
+  --background: var(--vd-ink);
+  --color: #fff;
+  --border-radius: var(--vd-r-m);
+  --button-color: #7fd6c4;
+}
+
+ion-toast.danger {
+  --background: var(--vd-danger);
+  --button-color: #fff;
+}
+
+ion-modal.vd-sheet {
+  --border-radius: 24px 24px 0 0;
+  --width: min(560px, 100%);
+  --background: var(--vd-surface);
+}
+
+textarea.vd-input {
+  min-height: 92px;
+  padding: 12px 14px;
+  font-family: inherit;
+  line-height: 1.4;
+  resize: vertical;
+}
+
+/* Body of a bottom sheet (ion-modal.vd-sheet) */
+.vd-sheet-body {
+  padding: 22px 20px calc(28px + env(safe-area-inset-bottom, 0px));
+
+  h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
   }
 
-  em {
-    font-style: normal;
-    font-size: 11px;
-    background: #eef0ff;
-    color: #4f46e5;
-    border-radius: 99px;
-    padding: 2px 8px;
+  .vd-card {
+    margin: 16px 0 0;
+  }
+
+  .vd-card > .vd-label:first-child {
+    margin-top: 0;
+  }
+
+  .vd-btn.block {
+    margin-top: 14px;
+  }
+}
+
+.vd-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vd-grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+ion-alert {
+  --background: var(--vd-surface);
+  --max-width: 360px;
+}
+
+.vd-skel {
+  height: 64px;
+  margin-bottom: 1px;
+  background: linear-gradient(90deg, #efeeea 25%, #f8f7f4 50%, #efeeea 75%) 0 0 / 200% 100%;
+  animation: vd-shimmer 1.2s infinite;
+}
+
+@keyframes vd-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
   }
 }

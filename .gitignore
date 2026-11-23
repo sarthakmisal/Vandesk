@@ -78,3 +78,6 @@ Thumbs.db
 # local dev database
 /data
 .env
+
+*.zip
+

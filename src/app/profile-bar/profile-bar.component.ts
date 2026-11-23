@@ -4,12 +4,14 @@ import { Router } from '@angular/router';
 import { AuthService } from '../core/auth.service';
 import type { Lang } from '../core/i18n';
 import { L, setLang } from '../core/i18n';
+import { IconComponent } from '../ui/icon.component';
 
 /** Top bar on every screen: who is signed in, language, log out. */
 @Component({
   selector: 'app-profile-bar',
   templateUrl: './profile-bar.component.html',
   styleUrls: ['./profile-bar.component.scss'],
+  imports: [IconComponent],
 })
 export class ProfileBarComponent {
   private readonly auth = inject(AuthService);

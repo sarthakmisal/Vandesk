@@ -1,23 +1,25 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { AlertController, IonContent, ToastController } from '@ionic/angular';
+import { AlertController, IonContent } from '@ionic/angular';
 
 import { money } from '../core/format';
 import { L, T } from '../core/i18n';
 import type { LedgerRow, PlanRow } from '../fees/fees.models';
 import { FeesRepo } from '../fees/fees.repo';
 import { ProfileBarComponent } from '../profile-bar/profile-bar.component';
+import { IconComponent } from '../ui/icon.component';
+import { Toast } from '../ui/toast.service';
 
 /** Owner tools for the driver: monthly fee plan, payments ledger with reversals, reminders. */
 @Component({
   selector: 'app-ledger',
   templateUrl: 'ledger.page.html',
   styleUrls: ['ledger.page.scss'],
-  imports: [IonContent, ProfileBarComponent],
+  imports: [IonContent, ProfileBarComponent, IconComponent],
 })
 export class LedgerPage {
   private readonly repo = inject(FeesRepo);
   private readonly alert = inject(AlertController);
-  private readonly toast = inject(ToastController);
+  private readonly toast = inject(Toast);
 
   readonly rows = signal<LedgerRow[]>([]);
   readonly plans = signal<PlanRow[]>([]);
@@ -83,7 +85,7 @@ export class LedgerPage {
   async remind(): Promise<void> {
     await this.run(async () => {
       const r = await this.repo.remind();
-      await this.say(
+      this.say(
         r.sent
           ? `${r.sent} reminder emails sent` + (r.skipped ? ` · ${r.skipped} already sent today` : '')
           : r.skipped
@@ -97,16 +99,15 @@ export class LedgerPage {
     try {
       await f();
       if (ok) {
-        await this.say(ok);
+        this.say(ok);
       }
     } catch (e) {
-      await this.say((e as Error).message, 'danger');
+      this.toast.error((e as Error).message);
     }
     await this.load();
   }
 
-  private async say(message: string, color = 'dark'): Promise<void> {
-    const toast = await this.toast.create({ message, duration: 2800, color });
-    await toast.present();
+  private say(message: string): void {
+    this.toast.show(message);
   }
 }

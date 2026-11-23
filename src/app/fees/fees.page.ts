@@ -1,9 +1,11 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { IonContent, ModalController, ToastController } from '@ionic/angular';
+import { IonContent, ModalController } from '@ionic/angular';
 
 import { money } from '../core/format';
 import { L, T } from '../core/i18n';
 import { ProfileBarComponent } from '../profile-bar/profile-bar.component';
+import { IconComponent } from '../ui/icon.component';
+import { Toast } from '../ui/toast.service';
 
 import type { Mode, Row } from './fees.models';
 import { FeesRepo } from './fees.repo';
@@ -13,12 +15,12 @@ import { PaySheetComponent } from './pay-sheet/pay-sheet.component';
   selector: 'app-fees',
   templateUrl: 'fees.page.html',
   styleUrls: ['fees.page.scss'],
-  imports: [IonContent, ProfileBarComponent],
+  imports: [IonContent, ProfileBarComponent, IconComponent],
 })
 export class FeesPage {
   private readonly repo = inject(FeesRepo);
   private readonly modal = inject(ModalController);
-  private readonly toast = inject(ToastController);
+  private readonly toast = inject(Toast);
 
   readonly rows = signal<Row[]>([]);
   readonly today = signal(0);
@@ -47,16 +49,13 @@ export class FeesPage {
     }
   }
 
-  hue(name: string): string {
-    return `hsl(${[...name].reduce((a, c) => a + c.charCodeAt(0), 0) % 360} 70% 92%)`;
-  }
-
   async open(row: Row): Promise<void> {
     const modal = await this.modal.create({
       component: PaySheetComponent,
       componentProps: { row },
-      breakpoints: [0, 0.8],
-      initialBreakpoint: 0.8,
+      cssClass: 'vd-sheet',
+      breakpoints: [0, 0.64],
+      initialBreakpoint: 0.64,
     });
     await modal.present();
     const { data } = await modal.onDidDismiss<{ amount: number; mode: Mode }>();
@@ -69,25 +68,18 @@ export class FeesPage {
     try {
       const id = await this.repo.record(row.id, d.amount, d.mode);
       await this.load();
-      const toast = await this.toast.create({
-        message: `✓ ${row.name} · ${money(d.amount)}`,
-        duration: 8000,
-        position: 'bottom',
-        color: 'dark',
-        buttons: [
-          {
-            text: this.t().undo,
-            handler: async () => {
-              await this.repo.reverse(id, 'Undo');
-              await this.load();
-            },
+      this.toast.show(`${row.name} · ${money(d.amount)} received`, {
+        ms: 8000,
+        action: {
+          label: this.t().undo,
+          run: async () => {
+            await this.repo.reverse(id, 'Undo');
+            await this.load();
           },
-        ],
+        },
       });
-      await toast.present();
     } catch (e) {
-      const toast = await this.toast.create({ message: (e as Error).message, duration: 2500, color: 'danger' });
-      await toast.present();
+      this.toast.error((e as Error).message);
     }
   }
 }

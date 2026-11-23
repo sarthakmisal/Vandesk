@@ -1,40 +1,47 @@
 <ion-content [fullscreen]="true">
-  <div class="x-wrap">
+  <div class="vd-page">
     <app-profile-bar />
-    <h1 class="x-h">{{ t().students }}</h1>
+
+    <div class="head">
+      <h1 class="vd-h1">{{ t().students }}</h1>
+      <button type="button" class="vd-btn sm" (click)="add()"><vd-icon name="plus" [size]="16" />{{ t().add }}</button>
+    </div>
 
     <div class="seats">
       @for (v of veh(); track v.id) {
-      <div class="sv">
-        <div><b>{{ v.short }}</b><span>{{ v.used }}/{{ v.cap }}</span></div>
-        <div class="x-pr"><i [style.width.%]="(v.used / v.cap) * 100" [class.full]="v.used >= v.cap"></i></div>
+      <div class="vd-card sv">
+        <div class="r"><b>{{ v.short }}</b><span>{{ v.used }}/{{ v.cap }}</span></div>
+        <div class="vd-bar"><i [style.width.%]="(v.used / v.cap) * 100" [class.full]="v.used >= v.cap"></i></div>
       </div>
       }
     </div>
 
-    <input
-      class="x-in search"
-      type="search"
-      [placeholder]="'🔍 ' + t().search"
-      [attr.aria-label]="t().search"
-      (input)="onSearch($event)"
-    />
+    <label class="search">
+      <vd-icon name="search" [size]="18" />
+      <input
+        class="vd-input"
+        type="search"
+        [placeholder]="t().search"
+        [attr.aria-label]="t().search"
+        (input)="onSearch($event)"
+      />
+    </label>
 
-    @for (r of shown(); track r.id) {
-    <article class="x-card">
-      <div class="x-av">{{ r.name[0] }}</div>
-      <div class="x-mid">
-        <b>{{ r.name }}</b>
-        <span>Class {{ r.cls }} · 📍 {{ r.stop }}</span>
-      </div>
-      <span class="x-pill">{{ r.vehicle }}</span>
-    </article>
-    } @if (!loading() && shown().length === 0) {
-    <div class="empty">—</div>
+    @if (shown().length) {
+    <div class="vd-list">
+      @for (r of shown(); track r.id) {
+      <article class="vd-item">
+        <span class="vd-avatar">{{ r.name[0] }}</span>
+        <div class="vd-mid">
+          <b>{{ r.name }}</b>
+          <span>Class {{ r.cls }} · {{ r.stop }}</span>
+        </div>
+        <span class="vd-pill mute">{{ r.vehicle }}</span>
+      </article>
+      }
+    </div>
+    } @else if (!loading()) {
+    <div class="vd-card vd-empty">—</div>
     }
   </div>
-
-  <ion-fab slot="fixed" vertical="bottom" horizontal="center">
-    <button type="button" class="x-go alt add" (click)="add()">＋ {{ t().add }}</button>
-  </ion-fab>
 </ion-content>

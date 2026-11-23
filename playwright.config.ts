@@ -19,7 +19,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm start -- --port 4200',
+    command: 'npm run start:demo -- --port 4200',
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

@@ -1,34 +1,51 @@
+.head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+
+  .vd-h1 {
+    margin-bottom: 0;
+  }
+}
+
 .seats {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   margin-bottom: 14px;
 }
 
 .sv {
   flex: 1;
-  background: #fff;
-  border: 1px solid #eceef7;
-  border-radius: 18px;
+  margin: 0;
   padding: 12px 14px;
+}
 
-  div:first-child {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
+.r {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
 
-    span {
-      color: #64748b;
-      font-weight: 600;
-    }
+  span {
+    color: var(--vd-ink-3);
+    font-weight: 600;
   }
 }
 
 .search {
+  position: relative;
+  display: block;
   margin-bottom: 14px;
-}
 
-.empty {
-  text-align: center;
-  padding: 30px;
-  color: #94a3b8;
+  vd-icon {
+    position: absolute;
+    top: 15px;
+    left: 14px;
+    color: var(--vd-ink-3);
+  }
+
+  .vd-input {
+    padding-left: 42px;
+  }
 }

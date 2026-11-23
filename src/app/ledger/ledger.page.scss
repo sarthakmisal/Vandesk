@@ -1,28 +1,22 @@
 .plan {
-  flex-direction: column;
-  align-items: stretch;
-  gap: 14px;
-  padding: 18px;
+  margin-top: 14px;
 }
 
 .top {
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
-  align-items: center;
   gap: 12px;
+  margin-bottom: 16px;
+}
+
+.fee {
+  font-size: 32px;
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.03em;
 }
 
 .rev {
-  opacity: 0.6;
-}
-
-.small {
-  padding: 8px 12px;
-  font-size: 13px;
-}
-
-.empty {
-  text-align: center;
-  padding: 30px;
-  color: #94a3b8;
+  opacity: 0.55;
 }

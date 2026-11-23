@@ -1,29 +1,45 @@
 <div class="ps">
-  <div class="who">
-    {{ row.name }}<small>{{ row.months }} {{ t().months }}</small>
+  <div class="top">
+    <span class="vd-avatar">{{ row.name[0] }}</span>
+    <div class="vd-mid">
+      <b>{{ row.name }}</b>
+      <span>{{ row.months }} {{ t().months }}</span>
+    </div>
   </div>
+
   <div class="amt">{{ money(amount()) }}</div>
 
-  <div class="chips">
+  <div class="vd-chips">
     @for (s of row.steps; track s; let i = $index; let last = $last) {
-      <button type="button" [class.on]="!custom() && amount() === s" (click)="pick(s)">
-        {{ last ? t().all : i + 1 }}<b>{{ money(s) }}</b>
+      <button type="button" class="vd-chip" [class.on]="!custom() && amount() === s" (click)="pick(s)">
+        {{ last ? t().all : i + 1 }}<small>{{ money(s) }}</small>
       </button>
     }
+    <button type="button" class="vd-chip" [class.on]="custom()" (click)="custom.set(true)">{{ t().other }}</button>
   </div>
 
-  @if (!custom()) {
-    <button type="button" class="lnk" (click)="custom.set(true)">{{ t().other }}</button>
-  } @else {
-    <input type="number" inputmode="numeric" min="1" placeholder="₹" aria-label="Amount" (input)="setCustom($event)" />
+  @if (custom()) {
+    <input
+      class="vd-input"
+      type="number"
+      inputmode="numeric"
+      min="1"
+      placeholder="₹"
+      aria-label="Amount"
+      (input)="setCustom($event)"
+    />
   }
 
-  <div class="mode">
-    <button type="button" [class.on]="mode() === 'cash'" (click)="mode.set('cash')">💵 {{ t().cash }}</button>
-    <button type="button" [class.on]="mode() === 'upi'" (click)="mode.set('upi')">📱 {{ t().upi }}</button>
+  <div class="vd-seg">
+    <button type="button" [class.on]="mode() === 'cash'" (click)="mode.set('cash')">
+      <vd-icon name="cash" [size]="18" />{{ t().cash }}
+    </button>
+    <button type="button" [class.on]="mode() === 'upi'" (click)="mode.set('upi')">
+      <vd-icon name="phone" [size]="18" />{{ t().upi }}
+    </button>
   </div>
 
-  <button type="button" class="go" [disabled]="!(amount() > 0)" (click)="ok()">
-    ✓ {{ t().received }} {{ money(amount()) }}
+  <button type="button" class="vd-btn lg block" [disabled]="!(amount() > 0)" (click)="ok()">
+    <vd-icon name="check" [size]="20" />{{ t().received }} {{ money(amount()) }}
   </button>
 </div>

@@ -1,0 +1,101 @@
+.top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sp {
+  margin-top: 10px;
+}
+
+.grow {
+  flex: 1;
+}
+
+.seats {
+  width: 96px;
+}
+
+.hint {
+  margin: 8px 2px 0;
+  line-height: 1.4;
+
+  &.first {
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+}
+
+.one {
+  grid-template-columns: 1fr;
+}
+
+/* Two lines per stop on a phone (name, then time and buttons), one line from tablet width */
+.stop {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) 36px 36px 36px;
+  grid-template-areas:
+    'n nm nm nm nm'
+    '. tm up dn rm';
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
+
+  .vd-input {
+    min-width: 0;
+    min-height: 42px;
+    padding: 0 10px;
+    font-size: 15px;
+  }
+
+  .nm {
+    grid-area: nm;
+  }
+
+  .tm {
+    grid-area: tm;
+  }
+
+  .n {
+    grid-area: n;
+  }
+
+  &.add {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'nm nm'
+      'tm add';
+    margin: 14px 0 0;
+  }
+}
+
+@media (min-width: 600px) {
+  .stop {
+    grid-template-columns: 18px minmax(0, 1fr) 110px 36px 36px 36px;
+    grid-template-areas: 'n nm tm up dn rm';
+  }
+
+  .stop.add {
+    grid-template-columns: minmax(0, 1fr) 110px auto;
+    grid-template-areas: 'nm tm add';
+  }
+}
+
+.ic {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 36px;
+  border-radius: var(--vd-r-s);
+  color: var(--vd-ink-3);
+
+  &[disabled] {
+    opacity: 0.25;
+  }
+}
+
+.danger {
+  color: var(--vd-danger);
+}

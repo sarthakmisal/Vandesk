@@ -2,49 +2,54 @@
   <div class="as">
     <h2>{{ t().add }}</h2>
 
-    <label class="x-lb" for="n-name">Student name</label>
-    <input id="n-name" class="x-in" autocomplete="off" (input)="set('name', $event)" />
+    <label class="vd-label" for="n-name">Student name</label>
+    <input id="n-name" class="vd-input" autocomplete="off" (input)="set('name', $event)" />
 
-    <label class="x-lb" for="n-cls">Class</label>
-    <input id="n-cls" class="x-in" (input)="set('cls', $event)" />
+    <label class="vd-label" for="n-cls">Class</label>
+    <input id="n-cls" class="vd-input" (input)="set('cls', $event)" />
 
-    <div class="x-lb">Vehicle</div>
-    <div class="x-chips">
+    <span class="vd-label">Vehicle</span>
+    <div class="vd-chips">
       @for (v of veh(); track v.id) {
         <button
           type="button"
-          class="x-chip"
+          class="vd-chip"
           [class.on]="selVeh() === v.id"
           [disabled]="v.used >= v.cap"
           (click)="pick(v.id)"
         >
-          {{ v.short }}<small>{{ v.used >= v.cap ? 'Full' : v.cap - v.used + ' seats free' }}</small>
+          {{ v.short
+          }}<small>{{
+            v.used >= v.cap ? 'Full' : v.cap - v.used + (v.cap - v.used === 1 ? ' seat free' : ' seats free')
+          }}</small>
         </button>
       }
     </div>
 
-    <div class="x-lb">Pickup stop</div>
-    <div class="x-chips">
+    <span class="vd-label">Pickup stop</span>
+    <div class="vd-chips">
       @for (s of stops(); track s.id) {
-        <button type="button" class="x-chip" [class.on]="selStop() === s.id" (click)="selStop.set(s.id)">
+        <button type="button" class="vd-chip" [class.on]="selStop() === s.id" (click)="selStop.set(s.id)">
           {{ s.name }}
         </button>
       }
     </div>
 
-    <label class="x-lb" for="n-gname">Guardian name</label>
-    <input id="n-gname" class="x-in" autocomplete="off" (input)="set('gname', $event)" />
+    <label class="vd-label" for="n-gname">Guardian name</label>
+    <input id="n-gname" class="vd-input" autocomplete="off" (input)="set('gname', $event)" />
 
-    <label class="x-lb" for="n-email">Guardian email</label>
-    <input id="n-email" class="x-in" type="email" inputmode="email" (input)="set('email', $event)" />
+    <label class="vd-label" for="n-email">Guardian email</label>
+    <input id="n-email" class="vd-input" type="email" inputmode="email" (input)="set('email', $event)" />
 
-    <label class="x-lb" for="n-phone">Guardian phone</label>
-    <input id="n-phone" class="x-in" type="tel" inputmode="tel" (input)="set('phone', $event)" />
+    <label class="vd-label" for="n-phone">Guardian phone</label>
+    <input id="n-phone" class="vd-input" type="tel" inputmode="tel" (input)="set('phone', $event)" />
 
     @if (err()) {
-      <div class="x-err">{{ err() }}</div>
+      <div class="vd-err">{{ err() }}</div>
     }
 
-    <button type="button" class="x-go save" (click)="save()">✓ {{ t().add }}</button>
+    <button type="button" class="vd-btn lg block save" (click)="save()">
+      <vd-icon name="check" [size]="20" />{{ t().add }}
+    </button>
   </div>
 </ion-content>

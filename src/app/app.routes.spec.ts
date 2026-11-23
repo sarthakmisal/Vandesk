@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
-import { AuthService } from './core/auth';
+import { AuthService } from './core/auth.service';
 import { REPO_PROVIDERS } from './core/providers';
 
 describe('Route-level RBAC', () => {
@@ -28,10 +28,10 @@ describe('Route-level RBAC', () => {
     expect(await go('/does/not/exist')).toBe('/login');
   });
 
-  it('a driver lands on the Fees tab and can reach all three tabs', async () => {
+  it('a driver lands on the Trip tab and can reach the tabs', async () => {
     auth.login('u1');
-    expect(await go('/')).toBe('/driver/fees');
-    expect(await go('/driver')).toBe('/driver/fees');
+    expect(await go('/')).toBe('/driver/trip');
+    expect(await go('/driver')).toBe('/driver/trip');
     expect(await go('/driver/students')).toBe('/driver/students');
     expect(await go('/driver/trip')).toBe('/driver/trip');
   });
@@ -52,13 +52,13 @@ describe('Route-level RBAC', () => {
 
   it('a signed-in user is bounced away from /login to their home', async () => {
     auth.login('u2');
-    expect(await go('/login')).toBe('/driver/fees');
+    expect(await go('/login')).toBe('/driver/trip');
   });
 
   it('unknown sub-paths never give a blank screen (go home)', async () => {
     auth.login('u1');
-    expect(await go('/driver/fees/garbage')).toBe('/driver/fees');
-    expect(await go('/nope')).toBe('/driver/fees');
+    expect(await go('/driver/fees/garbage')).toBe('/driver/trip');
+    expect(await go('/nope')).toBe('/driver/trip');
   });
 
   it('logging out (as the profile bar does) lands on /login and re-locks the driver area', async () => {
@@ -72,7 +72,7 @@ describe('Route-level RBAC', () => {
   it('a suspended driver is bounced to /login on the next navigation', async () => {
     auth.login('u1');
     await go('/driver/fees');
-    TestBed.inject((await import('./core/mock.db')).MockDb).drivers[0].active = false;
+    TestBed.inject((await import('./core/mock-db')).MockDb).drivers[0].active = false;
     expect(await go('/driver/trip')).toBe('/login');
   });
 });

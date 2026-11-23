@@ -1,0 +1,192 @@
+<ion-content>
+  @if (v(); as b) {
+    <div class="vd-sheet-body">
+      <div class="top">
+        <div>
+          <h2>{{ b.label }}</h2>
+          <div class="vd-muted">{{ b.used }}/{{ b.cap }} seats · {{ b.stops }} stops</div>
+        </div>
+        <span class="vd-pill" [class.mute]="!b.inService">{{ b.inService ? 'In service' : 'Retired' }}</span>
+      </div>
+
+      <section class="vd-card">
+        <span class="vd-label">Details</span>
+        <div class="vd-grid2 one">
+          <input class="vd-input" aria-label="Name" [value]="edit.name" (input)="edit.name = val($event)" />
+          <input class="vd-input" aria-label="Registration" [value]="edit.regNo" (input)="edit.regNo = val($event)" />
+        </div>
+        <div class="vd-row sp">
+          <input
+            class="vd-input seats"
+            type="number"
+            min="1"
+            inputmode="numeric"
+            aria-label="Seats"
+            [value]="edit.capacity"
+            (input)="edit.capacity = val($event)"
+          />
+          <span class="vd-muted grow">seats</span>
+          <button type="button" class="vd-btn sm" [disabled]="busy()" (click)="saveDetails()">Save</button>
+        </div>
+      </section>
+
+      <section class="vd-card">
+        <span class="vd-label">Driver</span>
+        @if (b.driver) {
+          <div class="vd-row">
+            <div class="vd-mid grow">
+              <b>{{ b.driver }}</b>
+              <div class="vd-muted">{{ b.driverEmail }}{{ b.active ? '' : ' · suspended' }}</div>
+            </div>
+            <button
+              type="button"
+              class="vd-btn sm"
+              [class.ghost]="!b.active"
+              [class.soft]="b.active"
+              [disabled]="busy()"
+              (click)="toggleDriver()"
+            >
+              {{ b.active ? 'Suspend' : 'Activate' }}
+            </button>
+          </div>
+        } @else {
+          <div class="vd-muted">No driver assigned.</div>
+        }
+        @if (b.inService) {
+          <div class="vd-grid2 one sp">
+            <input
+              class="vd-input"
+              placeholder="New driver name"
+              aria-label="New driver name"
+              (input)="driver.name = val($event)"
+            />
+            <input
+              class="vd-input"
+              type="email"
+              placeholder="Email"
+              aria-label="New driver email"
+              (input)="driver.email = val($event)"
+            />
+          </div>
+          <button type="button" class="vd-btn sm ghost sp" [disabled]="busy()" (click)="replaceDriver()">
+            {{ b.driver ? 'Replace driver' : 'Assign driver' }}
+          </button>
+          @if (b.driver) {
+            <p class="vd-muted hint">The current driver is signed out and suspended.</p>
+          }
+        }
+      </section>
+
+      <section class="vd-card">
+        <span class="vd-label">Monthly fee</span>
+        <div class="vd-muted">Now: {{ b.fee ? money(b.fee) : 'not set' }} per student</div>
+        <div class="vd-grid2 sp">
+          <input
+            class="vd-input"
+            type="number"
+            min="1"
+            inputmode="numeric"
+            placeholder="New fee (₹)"
+            aria-label="New monthly fee in rupees"
+            (input)="fee.amount = val($event)"
+          />
+          <select class="vd-input" aria-label="Applies from month" (change)="fee.from = val($event)">
+            @for (m of months; track m.value) {
+              <option [value]="m.value">{{ m.label }}</option>
+            }
+          </select>
+        </div>
+        <button type="button" class="vd-btn sm ghost sp" [disabled]="busy()" (click)="saveFee()">Schedule fee</button>
+        <p class="vd-muted hint">Applies from the 1st of the chosen month. Dues already raised never change.</p>
+      </section>
+
+      <section class="vd-card">
+        <span class="vd-label">Stops, in pickup order</span>
+        <p class="vd-muted hint first">
+          The driver's "next student" follows this order. The drop run goes the other way.
+        </p>
+        @for (s of stops(); track s.id; let i = $index; let first = $first; let last = $last) {
+          <div class="stop">
+            <span class="n">{{ i + 1 }}</span>
+            <input class="vd-input nm" aria-label="Stop name" [value]="s.name" (change)="rename(s, $event)" />
+            <input
+              class="vd-input tm"
+              type="time"
+              aria-label="Usual time"
+              [value]="s.typical"
+              (change)="retime(s, $event)"
+            />
+            <button
+              type="button"
+              class="ic"
+              aria-label="Move up"
+              style="grid-area: up"
+              [disabled]="first || busy()"
+              (click)="move(s, 'up')"
+            >
+              <vd-icon name="up" [size]="16" />
+            </button>
+            <button
+              type="button"
+              class="ic"
+              aria-label="Move down"
+              style="grid-area: dn"
+              [disabled]="last || busy()"
+              (click)="move(s, 'down')"
+            >
+              <vd-icon name="down" [size]="16" />
+            </button>
+            <button
+              type="button"
+              class="ic"
+              aria-label="Remove stop"
+              style="grid-area: rm"
+              [disabled]="busy()"
+              (click)="remove(s)"
+            >
+              <vd-icon name="x" [size]="16" />
+            </button>
+          </div>
+        } @empty {
+          <div class="vd-muted">No stops yet. Add the first one below.</div>
+        }
+        <div class="stop add">
+          <input
+            class="vd-input nm"
+            placeholder="New stop"
+            aria-label="New stop name"
+            [value]="stop.name"
+            (input)="stop.name = val($event)"
+          />
+          <input
+            class="vd-input tm"
+            type="time"
+            aria-label="Usual time for the new stop"
+            [value]="stop.typical"
+            (input)="stop.typical = val($event)"
+          />
+          <button type="button" class="vd-btn sm" style="grid-area: add" [disabled]="busy()" (click)="addStop()">
+            <vd-icon name="plus" [size]="16" />Add
+          </button>
+        </div>
+      </section>
+
+      <section class="vd-card">
+        <span class="vd-label">Bus status</span>
+        @if (b.inService) {
+          <p class="vd-muted hint first">
+            Retiring needs an empty bus: move its students first. The driver loses access.
+          </p>
+          <button type="button" class="vd-btn sm ghost danger" [disabled]="busy()" (click)="setInService(false)">
+            Retire bus
+          </button>
+        } @else {
+          <p class="vd-muted hint first">This bus is retired. Bring it back, then assign a driver.</p>
+          <button type="button" class="vd-btn sm" [disabled]="busy()" (click)="setInService(true)">Restore bus</button>
+        }
+      </section>
+
+      <button type="button" class="vd-btn lg block ink" (click)="close()">Done</button>
+    </div>
+  }
+</ion-content>

@@ -72,6 +72,9 @@ describe('RBAC and flows', () => {
       await expect(trip.children()).rejects.toThrow(NOT_ALLOWED);
       await expect(admin.overview()).rejects.toThrow(NOT_ALLOWED);
       await expect(admin.setDriverActive('u1', false)).rejects.toThrow(NOT_ALLOWED);
+      await expect(admin.moveStudent('s1', 'v2', '')).rejects.toThrow(NOT_ALLOWED);
+      await expect(admin.setFee('v1', 100, '2027-01-01')).rejects.toThrow(NOT_ALLOWED);
+      await expect(admin.deleteStop('t1')).rejects.toThrow(NOT_ALLOWED);
     });
 
     it('onboards a student: seat limit, validation, and the new student shows up in fees', async () => {
@@ -218,7 +221,6 @@ describe('RBAC and flows', () => {
     it('cannot run operations', async () => {
       await expect(trip.start('pickup')).rejects.toThrow(NOT_ALLOWED);
       await expect(fees.record('s1', 100, 'cash')).rejects.toThrow(NOT_ALLOWED);
-      await expect(students.add(newStudent('X', 'v1'))).rejects.toThrow(/own vehicle|Not allowed/);
     });
 
     it('suspends a driver: login blocked and an existing session is invalidated', async () => {

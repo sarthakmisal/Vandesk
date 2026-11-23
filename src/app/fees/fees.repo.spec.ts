@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { AuthService } from '../core/auth';
+import { AuthService } from '../core/auth.service';
 import { REPO_PROVIDERS } from '../core/providers';
 
 import { FeesRepo } from './fees.repo';
@@ -46,11 +46,11 @@ describe('FeesRepo', () => {
     expect((await repo.list()).some((r) => r.id === 's4')).toBe(false);
   });
 
-  it('undo writes a reversal, restores the balance and is idempotent', async () => {
+  it('undo writes a reversal, restores the balance and cannot be reversed twice', async () => {
     auth.login('u1');
     const pid = await repo.record('s5', 30000, 'cash');
-    await repo.undo(pid);
-    await repo.undo(pid);
+    await repo.reverse(pid, 'Undo');
+    await expect(repo.reverse(pid, 'Undo')).rejects.toThrow('Already reversed');
     const rohan = (await repo.list()).find((r) => r.id === 's5');
     expect(rohan?.balance).toBe(150000);
     expect(await repo.collectedToday()).toBe(0);
@@ -82,7 +82,7 @@ describe('FeesRepo', () => {
   });
 
   it('a newly joined student gets dues from their join month', async () => {
-    const db = (await import('../core/mock.db')).MockDb;
+    const db = (await import('../core/mock-db')).MockDb;
     const mock = TestBed.inject(db);
     auth.login('u1');
     mock.students.push({

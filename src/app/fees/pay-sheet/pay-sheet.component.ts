@@ -4,18 +4,21 @@ import { ModalController } from '@ionic/angular';
 
 import { money } from '../../core/format';
 import { L, T } from '../../core/i18n';
+import { IconComponent } from '../../ui/icon.component';
 import type { Mode, Row } from '../fees.models';
 
-/** Bottom sheet: pick how much was received and how, then one big green button. Defaults to paying everything. */
+/** Bottom sheet: pick how much was received and how, then one big button. Defaults to paying everything. */
 @Component({
   selector: 'app-pay-sheet',
   templateUrl: './pay-sheet.component.html',
   styleUrls: ['./pay-sheet.component.scss'],
+  imports: [IconComponent],
 })
 export class PaySheetComponent implements OnInit {
   @Input({ required: true }) row!: Row; // set by ModalController via componentProps
 
-  private readonly modal = inject(ModalController);
+  // NB: never name this `modal`: Ionic reserves that property on components shown inside ion-modal.
+  private readonly modalCtrl = inject(ModalController);
 
   readonly t = computed(() => T[L()]);
   readonly money = money;
@@ -38,7 +41,7 @@ export class PaySheetComponent implements OnInit {
 
   ok(): void {
     if (this.amount() > 0) {
-      void this.modal.dismiss({ amount: Math.round(this.amount()), mode: this.mode() });
+      void this.modalCtrl.dismiss({ amount: Math.round(this.amount()), mode: this.mode() });
     }
   }
 }

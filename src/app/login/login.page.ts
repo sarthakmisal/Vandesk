@@ -6,6 +6,7 @@ import { IonContent } from '@ionic/angular';
 import { environment } from '../../environments/environment';
 import type { Account } from '../core/auth.service';
 import { AuthService } from '../core/auth.service';
+import { IconComponent } from '../ui/icon.component';
 
 /**
  * API mode: email + 6-digit code (OTP) sent by email. Mock mode: pick a demo account.
@@ -15,7 +16,7 @@ import { AuthService } from '../core/auth.service';
   selector: 'app-login',
   templateUrl: 'login.page.html',
   styleUrls: ['login.page.scss'],
-  imports: [IonContent],
+  imports: [IonContent, IconComponent],
 })
 export class LoginPage implements OnInit {
   private readonly auth = inject(AuthService);

@@ -9,9 +9,9 @@ import { provideRouter } from '@angular/router';
 import { provideIonicAngular } from '@ionic/angular';
 
 import { AdminPage } from './admin/admin.page';
-import { AuthService } from './core/auth';
+import { AuthService } from './core/auth.service';
+import { setLang } from './core/i18n';
 import { REPO_PROVIDERS } from './core/providers';
-import { setLang } from './fees/fees.models';
 import { FeesPage } from './fees/fees.page';
 import { LoginPage } from './login/login.page';
 import { ParentPage } from './parent/parent.page';
@@ -60,7 +60,7 @@ describe('Screens render with seed data', () => {
     expect(t).toContain('5 months pending');
     expect(t).not.toContain('Akshay Patil'); // fully paid
     expect(t).not.toContain('Diya Naik'); // other vehicle
-    expect((f.nativeElement as HTMLElement).querySelectorAll('article.card').length).toBe(4);
+    expect((f.nativeElement as HTMLElement).querySelectorAll('button.vd-item').length).toBe(4);
   });
 
   it('Fees switches language live (signal-driven)', async () => {
@@ -85,7 +85,7 @@ describe('Screens render with seed data', () => {
 
   it('Students search filters the list (real input event)', async () => {
     const f = await mount(StudentsPage, 'u1');
-    const input = (f.nativeElement as HTMLElement).querySelector('input.x-in') as HTMLInputElement;
+    const input = (f.nativeElement as HTMLElement).querySelector('input.vd-input') as HTMLInputElement;
     input.value = 'rohan';
     input.dispatchEvent(new Event('input'));
     await f.whenStable();
@@ -99,25 +99,34 @@ describe('Screens render with seed data', () => {
     expect(text(f)).toContain('Akshay Patil');
   });
 
-  it('Trip shows the ready banner, start button and roster in route order', async () => {
-    const t = text(await mount(TripPage, 'u1'));
-    expect(t).toContain('Ready · 4 students');
+  it('Trip idle shows the riding count and a big start button (pickup run)', async () => {
+    const f = await mount(TripPage, 'u1');
+    f.componentInstance.setDir('pickup'); // the default direction follows the clock; pin it
+    await f.whenStable();
+    f.detectChanges();
+    const t = text(f);
     expect(t).toContain('Start trip');
-    expect(t).toContain('Not coming'); // Ishita
-    expect(t.indexOf('Akshay Patil')).toBeLessThan(t.indexOf('Rohan More'));
+    expect(t).toContain('Picked up');
+    expect(f.componentInstance.plan().total).toBe(4); // Ishita is "not going"
+    expect((f.nativeElement as HTMLElement).querySelector('.d-big')?.textContent).toContain('4');
   });
 
-  it('Trip start → banner flips to started with a live count', async () => {
+  it('Trip start → shows the first student and a live position, one tap moves on', async () => {
     const f = await mount(TripPage, 'u1');
+    f.componentInstance.setDir('pickup');
+    await f.whenStable();
     await f.componentInstance.start();
     f.detectChanges();
     await f.whenStable();
     f.detectChanges();
-    expect(text(f)).toContain('0/4 ✓');
-    expect(text(f)).toContain('Reached school');
-    await f.componentInstance.tap('s1');
+    expect(text(f)).toContain('1 / 4');
+    expect(text(f)).toContain('Akshay Patil');
+    const first = f.componentInstance.plan().current;
+    await f.componentInstance.mark(first as NonNullable<typeof first>);
     f.detectChanges();
-    expect(text(f)).toContain('1/4 ✓');
+    await f.whenStable();
+    f.detectChanges();
+    expect(text(f)).toContain('2 / 4');
   });
 
   it('Parent shows status message, stop timeline and going toggle', async () => {
@@ -135,7 +144,7 @@ describe('Screens render with seed data', () => {
     const f = await mount(ParentPage, 'g1');
     f.componentInstance.pick('s2');
     await f.whenStable();
-    f.componentInstance.tab = 'fees';
+    f.componentInstance.tab.set('fees');
     f.detectChanges();
     await f.whenStable();
     f.detectChanges();
@@ -154,18 +163,19 @@ describe('Screens render with seed data', () => {
     expect(t).toContain('Mini bus · MH-20 CD 5678');
     expect(t).toContain('Driver · Ramesh Kale');
     expect(t).toContain('5/6 seats');
-    expect(t).toContain('Active · Suspend');
+    expect(t).toContain('₹300/mo');
+    expect(t).toContain('Manage');
+    expect(t).toContain('Add bus');
   });
 
-  it('Admin can suspend a driver, which then blocks that driver’s login', async () => {
+  it('Admin Students view lists everyone with the bus and stop, ready to move', async () => {
     const f = await mount(AdminPage, 'admin');
-    const o = f.componentInstance.o;
-    expect(o).toBeDefined();
-    await f.componentInstance.toggle((o as NonNullable<typeof o>).vehicles[0]);
+    f.componentInstance.view.set('students');
     f.detectChanges();
-    await f.whenStable();
-    f.detectChanges();
-    expect(text(f)).toContain('Suspended · Activate');
-    expect(() => TestBed.inject(AuthService).login('u1')).toThrow('Account suspended. Contact VanDesk.');
+    const t = text(f);
+    expect(t).toContain('Akshay Patil');
+    expect(t).toContain('Hanuman Mandir');
+    expect((f.nativeElement as HTMLElement).querySelectorAll('button.vd-item').length).toBe(7);
+    expect(t).toContain('Add student');
   });
 });

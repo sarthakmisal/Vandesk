@@ -3,9 +3,11 @@ import { Injectable } from '@angular/core';
 /** Shared dummy tables (vehicle, stop, driver, guardian, student). Replaced by the API later; repos are the only readers. */
 export interface Vehicle {
   id: string;
-  label: string;
-  short: string;
+  label: string; // "Van · MH-20 AB 1234"
+  short: string; // "Van"
+  reg: string;
   cap: number;
+  inService: boolean;
 }
 export interface Stop {
   id: string;
@@ -18,7 +20,7 @@ export interface Driver {
   id: string;
   name: string;
   email: string;
-  veh: string;
+  veh: string; // '' = no vehicle (retired or replaced)
   active: boolean;
 }
 export interface Guardian {
@@ -42,8 +44,8 @@ export interface Student {
 export class MockDb {
   n = 100;
   vehicles: Vehicle[] = [
-    { id: 'v1', label: 'Van · MH-20 AB 1234', short: 'Van', cap: 6 },
-    { id: 'v2', label: 'Mini bus · MH-20 CD 5678', short: 'Bus', cap: 14 },
+    { id: 'v1', label: 'Van · MH-20 AB 1234', short: 'Van', reg: 'MH-20 AB 1234', cap: 6, inService: true },
+    { id: 'v2', label: 'Mini bus · MH-20 CD 5678', short: 'Bus', reg: 'MH-20 CD 5678', cap: 14, inService: true },
   ];
   stops: Stop[] = [
     { id: 't1', veh: 'v1', name: 'Hanuman Mandir', seq: 1, typical: '07:05' },

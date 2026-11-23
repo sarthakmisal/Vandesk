@@ -1,18 +1,13 @@
 {
   "name": "vandesk",
   "version": "0.0.1",
-  "author": "Ionic Framework",
-  "homepage": "https://ionicframework.com/",
+  "author": "VanDesk",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "start:api": "ng serve -c api",
+    "start:demo": "ng serve -c demo",
     "build": "ng build",
-    "serve": "node server/index.ts",
-    "dev:api": "node --watch server/index.ts",
-    "test:api": "node --test server/app.test.ts",
-    "typecheck:api": "tsc -p server/tsconfig.json",
-    "build:serve": "ng build && node server/index.ts",
+    "build:demo": "ng build -c demo",
     "watch": "ng build --watch --configuration development",
     "lint": "npm run eslint && npm run typecheck:e2e && npm run prettier -- --check",
     "lint:fix": "npm run eslint -- --fix && npm run prettier -- --write",
@@ -22,7 +17,12 @@
     "test": "npm run test:unit && npm run test:e2e",
     "test:unit": "ng test --no-watch",
     "test:unit:watch": "ng test --watch",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "build:back": "ng build && node scripts/copy-to-backend.mjs",
+    "build:native": "ng build -c native",
+    "cap:sync": "ng build -c native && cap sync",
+    "android": "npm run cap:sync && cap open android",
+    "ios": "npm run cap:sync && cap open ios"
   },
   "private": true,
   "dependencies": {
@@ -32,20 +32,13 @@
     "@angular/forms": "22.2.3",
     "@angular/platform-browser": "22.2.3",
     "@angular/router": "22.2.3",
-    "@capacitor/app": "8.1.2",
     "@capacitor/core": "8.6.0",
-    "@capacitor/haptics": "8.0.2",
-    "@capacitor/keyboard": "8.0.6",
-    "@capacitor/status-bar": "8.0.4",
     "@ionic/angular": "^9.0.0",
-    "compression": "^1.8.2",
-    "express": "^5.3.0",
     "ionicons": "^8.1.0",
-    "nodemailer": "^10.3.1",
-    "pg": "^8.23.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
-    "zod": "^4.6.7"
+    "@capacitor/android": "8.6.0",
+    "@capacitor/ios": "8.6.0"
   },
   "devDependencies": {
     "@angular/build": "22.2.4",
@@ -53,16 +46,11 @@
     "@angular/compiler-cli": "22.2.3",
     "@angular/language-service": "22.2.3",
     "@capacitor/cli": "8.6.0",
-    "@electric-sql/pglite": "^0.5.14",
     "@ionic/angular-toolkit": "^13.0.0",
     "@ionic/eslint-config": "^0.5.0",
     "@ionic/prettier-config": "^4.0.0",
     "@playwright/test": "^1.64.1",
-    "@types/compression": "^1.8.1",
-    "@types/express": "^5.0.6",
     "@types/node": "^24.19.2",
-    "@types/nodemailer": "^8.0.2",
-    "@types/pg": "^8.23.1",
     "angular-eslint": "22.6.0",
     "eslint": "^10.10.0",
     "jsdom": "^30.1.1",
@@ -72,5 +60,5 @@
     "vitest": "~5.0.5"
   },
   "prettier": "@ionic/prettier-config",
-  "description": "VanDesk: fees, onboarding and trips for school vans (driver, parent, admin)"
+  "description": "VanDesk: fees, onboarding and trips for school vans (driver, parent, admin). Ionic + Angular + Capacitor app; the API lives in ../back."
 }

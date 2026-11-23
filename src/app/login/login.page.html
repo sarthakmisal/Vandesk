@@ -1,57 +1,65 @@
 <ion-content [fullscreen]="true">
-  <div class="x-wrap">
-    <div class="logo">🚐</div>
-    <h1 class="x-h center">VanDesk</h1>
+  <main class="lg">
+    <div class="mark"><vd-icon name="bus" [size]="30" /></div>
+    <h1>VanDesk</h1>
+    <p class="vd-muted">School van trips, fees and attendance.</p>
 
     @if (mock) {
-    <p class="sub center">Demo mode: pick an account.</p>
+    <span class="vd-label">Demo: choose an account</span>
     @for (g of groups(); track g.t) {
-    <div class="x-lb">{{ g.t }}</div>
-    @for (a of g.list; track a.id) {
-    <button type="button" class="x-card" (click)="go(a)">
-      <span class="x-av">{{ a.name[0] }}</span>
-      <span class="x-mid">
-        <b>{{ a.name }}</b>
-        <span>{{ a.email }}</span>
-      </span>
-      <span class="x-pill">→</span>
-    </button>
-    } } } @else { @if (step() === 'email') {
-    <p class="sub center">Enter your email. We will send you a 6-digit code.</p>
-    <label class="x-lb" for="login-email">Email</label>
-    <input
-      id="login-email"
-      class="x-in"
-      type="email"
-      inputmode="email"
-      autocomplete="email"
-      [value]="email()"
-      (input)="on(email, $event)"
-    />
-    <button type="button" class="x-go alt cta" [disabled]="busy() || !email().includes('@')" (click)="send()">
-      Send code
-    </button>
-    } @else {
-    <p class="sub center">We sent a code to {{ email() }}.</p>
-    <label class="x-lb" for="login-code">6-digit code</label>
-    <input
-      id="login-code"
-      class="x-in code"
-      inputmode="numeric"
-      maxlength="6"
-      autocomplete="one-time-code"
-      [value]="code()"
-      (input)="on(code, $event)"
-    />
-    @if (hint()) {
-    <div class="sub center hint">{{ hint() }}</div>
+    <span class="vd-label sub">{{ g.t }}</span>
+    <div class="vd-list">
+      @for (a of g.list; track a.id) {
+      <button type="button" class="vd-item" (click)="go(a)">
+        <span class="vd-avatar">{{ a.name[0] }}</span>
+        <span class="vd-mid"><b>{{ a.name }}</b><span>{{ a.email }}</span></span>
+        <vd-icon name="chevron" [size]="18" />
+      </button>
+      }
+    </div>
+    } } @else {
+    <div class="vd-card form">
+      @if (step() === 'email') {
+      <label class="vd-label first" for="login-email">Email</label>
+      <input
+        id="login-email"
+        class="vd-input"
+        type="email"
+        inputmode="email"
+        autocomplete="email"
+        placeholder="you@example.com"
+        [value]="email()"
+        (input)="on(email, $event)"
+      />
+      <button type="button" class="vd-btn lg block cta" [disabled]="busy() || !email().includes('@')" (click)="send()">
+        Send code
+      </button>
+      <p class="vd-muted note">We email you a 6-digit code. No password.</p>
+      } @else {
+      <p class="note">Code sent to <b>{{ email() }}</b></p>
+      <label class="vd-label first" for="login-code">6-digit code</label>
+      <input
+        id="login-code"
+        class="vd-input code"
+        inputmode="numeric"
+        maxlength="6"
+        autocomplete="one-time-code"
+        [value]="code()"
+        (input)="on(code, $event)"
+      />
+      @if (hint()) {
+      <div class="hint">{{ hint() }}</div>
+      }
+      <button type="button" class="vd-btn lg block cta" [disabled]="busy() || code().length !== 6" (click)="verify()">
+        Sign in
+      </button>
+      <button type="button" class="lnk" (click)="back()">Use a different email</button>
+      } @if (err()) {
+      <div class="vd-err">{{ err() }}</div>
+      }
+    </div>
+    } @if (mock && err()) {
+    <div class="vd-err">{{ err() }}</div>
     }
-    <button type="button" class="x-go cta" [disabled]="busy() || code().length !== 6" (click)="verify()">
-      Sign in
-    </button>
-    <button type="button" class="lnk" (click)="back()">Use a different email</button>
-    } } @if (err()) {
-    <div class="x-err">{{ err() }}</div>
-    }
-  </div>
+  </main>
 </ion-content>

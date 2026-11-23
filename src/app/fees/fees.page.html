@@ -1,35 +1,48 @@
 <ion-content [fullscreen]="true">
-  <div class="x-wrap">
+  <div class="vd-page">
     <app-profile-bar />
 
     <section class="hero">
-      <span class="brand">🚐 {{ t().title }}</span>
+      <span class="vd-label">{{ t().pending }}</span>
       <div class="big">{{ money(pending()) }}</div>
-      <div class="sub">{{ t().pending }} · {{ rows().length }}</div>
-      <div class="pill">{{ t().today }} <b>{{ money(today()) }}</b></div>
+      <div class="meta">
+        <span>{{ rows().length }} {{ t().students }}</span>
+        <span>{{ t().today }} <b>{{ money(today()) }}</b></span>
+      </div>
     </section>
 
-    @if (loading()) { @for (i of skeleton; track i) {
-    <div class="sk"></div>
-    } } @if (err() && !loading()) {
-    <div class="err">
-      {{ t().err }}
-      <button type="button" (click)="load()">{{ t().retry }}</button>
+    @if (loading()) {
+    <div class="vd-list">
+      @for (i of skeleton; track i) {
+      <div class="vd-skel"></div>
+      }
     </div>
-    } @for (r of rows(); track r.id) {
-    <button type="button" class="x-card" (click)="open(r)">
-      <span class="x-av" [style.background]="hue(r.name)">{{ r.name[0] }}</span>
-      <span class="x-mid">
-        <b>{{ r.name }}</b>
-        <span>{{ r.months }} {{ t().months }}</span>
-      </span>
-      <span class="right">
-        <b>{{ money(r.balance) }}</b>
-        <span class="btn">✓ {{ t().received }}</span>
-      </span>
-    </button>
+    } @if (err() && !loading()) {
+    <div class="vd-card vd-empty">
+      <p>{{ t().err }}</p>
+      <button type="button" class="vd-btn sm" (click)="load()">{{ t().retry }}</button>
+    </div>
+    } @if (rows().length) {
+    <div class="vd-list">
+      @for (r of rows(); track r.id) {
+      <button type="button" class="vd-item" (click)="open(r)">
+        <span class="vd-avatar">{{ r.name[0] }}</span>
+        <span class="vd-mid">
+          <b>{{ r.name }}</b>
+          <span>{{ r.months }} {{ t().months }}</span>
+        </span>
+        <span class="amt">
+          <b>{{ money(r.balance) }}</b>
+          <i class="vd-btn sm soft"><vd-icon name="check" [size]="14" />{{ t().received }}</i>
+        </span>
+      </button>
+      }
+    </div>
     } @if (!loading() && !err() && rows().length === 0) {
-    <div class="clear">🎉 {{ t().clear }}</div>
+    <div class="vd-card vd-empty">
+      <vd-icon name="circleCheck" [size]="36" />
+      <p>{{ t().clear }}</p>
+    </div>
     }
   </div>
 </ion-content>

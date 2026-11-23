@@ -1,9 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 
-import { AuthService } from '../core/auth';
+import { AuthService } from '../core/auth.service';
 import { REPO_PROVIDERS } from '../core/providers';
 
-import type { NewStudent} from './students.repo';
+import type { NewStudent } from './students.repo';
 import { StudentsRepo } from './students.repo';
 
 const form = (over: Partial<NewStudent> = {}): NewStudent => ({

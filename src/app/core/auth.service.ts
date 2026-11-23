@@ -21,10 +21,22 @@ export type Perm =
   | 'trip.run'
   | 'attendance.set'
   | 'admin.view'
-  | 'drivers.manage';
+  | 'drivers.manage'
+  | 'vehicles.manage'
+  | 'students.move'
+  | 'fees.plan';
 
 export const PERMS: Record<Role, Perm[]> = {
-  admin: ['admin.view', 'drivers.manage', 'students.read', 'fees.read'], // VanDesk team: oversight, no daily operations
+  admin: [
+    'admin.view',
+    'drivers.manage',
+    'vehicles.manage',
+    'students.read',
+    'students.add',
+    'students.move',
+    'fees.read',
+    'fees.plan',
+  ], // VanDesk team: set up buses, drivers, stops, fees and placements; no daily operations (trips, payments)
   driver: ['fees.read', 'fees.record', 'students.read', 'students.add', 'trip.run'], // own vehicle only
   parent: ['fees.read', 'attendance.set'], // own children only
 };

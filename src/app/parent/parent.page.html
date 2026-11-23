@@ -1,65 +1,78 @@
 <ion-content [fullscreen]="true">
-  <div class="x-wrap">
+  <div class="vd-page">
     <app-profile-bar />
-    <h1 class="x-h">{{ kids().length > 1 ? 'My children' : 'My child' }}</h1>
+    <h1 class="vd-h1">{{ kids().length > 1 ? 'My children' : 'My child' }}</h1>
 
-    <div class="x-chips">
+    @if (kids().length > 1) {
+    <div class="vd-chips kids">
       @for (k of kids(); track k.id) {
-      <button type="button" class="x-chip" [class.on]="k.id === child()" (click)="pick(k.id)">
+      <button type="button" class="vd-chip" [class.on]="k.id === child()" (click)="pick(k.id)">
         {{ k.name.split(' ')[0] }}
       </button>
       }
     </div>
+    }
 
-    <div class="x-seg">
-      <button type="button" [class.on]="tab() === 'status'" (click)="tab.set('status')">📍 Track</button>
-      <button type="button" [class.on]="tab() === 'fees'" (click)="tab.set('fees')">💰 Fees</button>
+    <div class="vd-seg">
+      <button type="button" [class.on]="tab() === 'status'" (click)="tab.set('status')">
+        <vd-icon name="pin" [size]="17" />Track
+      </button>
+      <button type="button" [class.on]="tab() === 'fees'" (click)="tab.set('fees')">
+        <vd-icon name="wallet" [size]="17" />Fees
+      </button>
     </div>
 
     @if (p(); as info) { @if (tab() === 'status') {
-    <div class="x-card pc">
+    <div class="vd-card status">
       <div class="msg">{{ msg() }}</div>
       @if (info.last) {
-      <div class="sub">Last stop: {{ info.last.stop }} · {{ info.last.at }}</div>
+      <div class="vd-muted">Last stop: {{ info.last.stop }} · {{ info.last.at }}</div>
       } @if (!info.picked && info.going) {
-      <div class="sub">Usually at your stop ~{{ info.typical }}</div>
+      <div class="vd-muted">Usually at your stop ~{{ info.typical }}</div>
       }
     </div>
 
-    <div class="tl">
+    <div class="vd-card vd-tl">
       @for (s of info.stops; track s.name) {
-      <div class="st" [class.done]="s.done" [class.me]="s.mine">
+      <div class="vd-st" [class.done]="s.done" [class.me]="s.mine">
         <i></i><span>{{ s.name }}</span><small>{{ s.typical }}</small>
         @if (s.mine) {
-        <em>your stop</em>
+        <em class="vd-pill">your stop</em>
         }
       </div>
       }
     </div>
 
-    <button type="button" class="x-go alt" [disabled]="info.locked" (click)="going(!info.going)">
-      {{ info.going ? '🚫 ' + t().notGoing : '✓ Going today' }}
+    <button
+      type="button"
+      class="vd-btn lg block"
+      [class.ghost]="info.going"
+      [disabled]="info.locked"
+      (click)="going(!info.going)"
+    >
+      @if (info.going) {
+      <vd-icon name="x" [size]="20" />{{ t().notGoing }} } @else { <vd-icon name="check" [size]="20" />Going today }
     </button>
     @if (info.locked) {
-    <div class="x-err">Trip started. Please call the driver.</div>
+    <div class="vd-err">Trip started. Please call the driver.</div>
     } } } @if (fee(); as f) { @if (tab() === 'fees') {
-    <div class="x-card pc">
-      <div class="sub">{{ t().pending }}</div>
-      <div class="msg">{{ money(f.balance) }}</div>
+    <div class="vd-card status">
+      <div class="vd-muted">{{ t().pending }}</div>
+      <div class="msg big">{{ money(f.balance) }}</div>
     </div>
-    <div class="tl">
+    <div class="vd-card vd-tl">
       @for (r of f.rows; track r.per) {
-      <div class="st">
+      <div class="vd-st" [class.done]="r.paid >= r.amt">
         <span>{{ mon(r.per) }}</span><small>{{ money(r.paid) }} / {{ money(r.amt) }}</small>
         @if (r.paid >= r.amt) {
-        <em>paid</em>
+        <em class="vd-pill">paid</em>
         }
       </div>
       }
     </div>
-    <div class="sub note">Fees are collected by your driver. Ask him to record any payment.</div>
+    <p class="vd-muted note">Fees are collected by your driver. Ask him to record any payment.</p>
     } } @if (kids().length === 0) {
-    <div class="empty">No children linked to this account.</div>
+    <div class="vd-card vd-empty">No children linked to this account.</div>
     }
   </div>
 </ion-content>

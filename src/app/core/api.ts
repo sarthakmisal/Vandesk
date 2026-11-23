@@ -26,6 +26,10 @@ export class Api {
     return this.run(this.http.put<T>(environment.apiUrl + path, body));
   }
 
+  delete<T>(path: string): Promise<T> {
+    return this.run(this.http.delete<T>(environment.apiUrl + path));
+  }
+
   private async run<T>(o: Observable<T>): Promise<T> {
     try {
       return await firstValueFrom(o);
@@ -41,7 +45,14 @@ export const message = (e: unknown): string => {
       return 'No connection. Check your internet.';
     }
     const text = (e.error as { error?: string } | null)?.error;
-    return text ?? 'Something went wrong';
+    // HTML instead of JSON / proxy errors: the page is served but the VanDesk API is not behind it. A JSON 404 is the API itself saying "Not found".
+    if (
+      typeof text !== 'string' &&
+      (e.status === 404 || e.status === 405 || e.status >= 502 || typeof e.error === 'string')
+    ) {
+      return 'Cannot reach the VanDesk server. Start it with "npm run dev" in the back project, or use the demo build ("npm run build:demo").';
+    }
+    return typeof text === 'string' ? text : 'Something went wrong';
   }
   return e instanceof Error ? e.message : 'Something went wrong';
 };

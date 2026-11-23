@@ -1,13 +1,33 @@
+/* A floating dock: centred and narrow on desktop, full width on a phone. Hidden while a trip is running. */
+ion-tabs {
+  background: var(--vd-bg);
+}
+
 ion-tab-bar {
-  --background: #fff;
-  --border: 1px solid #eceef7;
-  height: 64px;
+  --background: var(--vd-surface);
+  --border: 0;
+  width: min(440px, calc(100% - 24px));
+  height: 60px;
+  margin: 4px auto calc(10px + env(safe-area-inset-bottom, 0px));
+  padding: 4px;
+  border: 1px solid var(--vd-line);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px -12px rgb(20 22 26 / 28%);
 }
 
 ion-tab-button {
-  --color: #94a3b8;
-  --color-selected: #4f46e5;
-  font-weight: 700;
+  --color: var(--vd-ink-3);
+  --color-selected: var(--vd-brand);
+  --background-focused: transparent;
+  --ripple-color: var(--vd-brand);
+  border-radius: 16px;
+  font-size: 11px;
+  font-weight: 600;
+  gap: 2px;
+
+  &.tab-selected {
+    background: var(--vd-brand-soft);
+  }
 }
 
 .hidden {

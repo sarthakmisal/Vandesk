@@ -1,17 +1,19 @@
-<div class="pb">
+<header class="pb">
   <div class="who">
-    <span class="avatar">{{ name()[0] }}</span>
-    <div>
+    <span class="vd-avatar">{{ name()[0] }}</span>
+    <div class="vd-mid">
       <b>{{ name() }}</b>
-      <small>{{ role() }}</small>
+      <span>{{ role() }}</span>
     </div>
   </div>
   <div class="right">
-    <div class="lang">
+    <div class="lang" role="group" aria-label="Language">
       @for (l of langs; track l) {
         <button type="button" [class.on]="l === cur()" (click)="set(l)">{{ label(l) }}</button>
       }
     </div>
-    <button type="button" class="out" aria-label="Log out" (click)="out()">⎋</button>
+    <button type="button" class="out" aria-label="Log out" (click)="out()">
+      <vd-icon name="logout" [size]="18" />
+    </button>
   </div>
-</div>
+</header>

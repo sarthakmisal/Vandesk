@@ -1,7 +1,6 @@
-// Development default: in-memory demo data, no backend needed (`npm start`).
-// `npm run start:api` uses environment.api.ts and talks to the Node API on :3000 through proxy.conf.json.
+// Default (npm start / ng serve): the real VanDesk API. proxy.conf.json forwards /api to http://localhost:3000 (the ../back server).
 export const environment = {
   production: false,
-  useMock: true,
+  useMock: false,
   apiUrl: '/api',
 };

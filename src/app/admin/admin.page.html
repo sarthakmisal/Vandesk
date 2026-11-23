@@ -1,32 +1,95 @@
 <ion-content [fullscreen]="true">
-  <div class="x-wrap">
+  <div class="vd-page">
     <app-profile-bar />
-    <h1 class="x-h">Platform</h1>
+    <div class="head">
+      <h1 class="vd-h1">Platform</h1>
+      @if (view() === 'buses') {
+      <button type="button" class="vd-btn sm" (click)="addBus()"><vd-icon name="plus" [size]="16" />Add bus</button>
+      } @else {
+      <button type="button" class="vd-btn sm" (click)="addStudent()">
+        <vd-icon name="plus" [size]="16" />Add student
+      </button>
+      }
+    </div>
 
     @if (o(); as ov) {
     <div class="tiles">
-      <div class="x-card tile"><span>Students</span><b>{{ ov.students }}</b></div>
-      <div class="x-card tile"><span>Outstanding</span><b>{{ money(ov.outstanding) }}</b></div>
-      <div class="x-card tile"><span>Collected today</span><b>{{ money(ov.collected) }}</b></div>
+      <div class="vd-card tile"><span>Students</span><b>{{ ov.students }}</b></div>
+      <div class="vd-card tile"><span>Outstanding</span><b>{{ money(ov.outstanding) }}</b></div>
+      <div class="vd-card tile"><span>Collected today</span><b>{{ money(ov.collected) }}</b></div>
     </div>
 
-    @for (v of ov.vehicles; track v.id) {
-    <article class="x-card vc">
+    <div class="vd-seg" role="tablist">
+      <button
+        type="button"
+        role="tab"
+        [class.on]="view() === 'buses'"
+        [attr.aria-selected]="view() === 'buses'"
+        (click)="view.set('buses')"
+      >
+        Buses
+      </button>
+      <button
+        type="button"
+        role="tab"
+        [class.on]="view() === 'students'"
+        [attr.aria-selected]="view() === 'students'"
+        (click)="view.set('students')"
+      >
+        Students
+      </button>
+    </div>
+
+    @if (view() === 'buses') { @for (v of ov.vehicles; track v.id) {
+    <article class="vd-card vc" [class.off]="!v.inService">
       <div class="hd">
         <div>
           <b>{{ v.label }}</b>
-          <div class="sub">Driver · {{ v.driver }}</div>
+          <div class="vd-muted">
+            {{ v.driver ? 'Driver · ' + v.driver : 'No driver' }}{{ v.driver && !v.active ? ' · suspended' : '' }}
+          </div>
         </div>
-        <span class="x-pill" [class.m]="v.trip === 'idle'">{{ v.trip }}</span>
+        <span class="vd-pill" [class.mute]="!v.inService || v.trip === 'idle'"
+          >{{ v.inService ? v.trip : 'retired' }}</span
+        >
       </div>
-      <div class="x-pr"><i [style.width.%]="(v.used / v.cap) * 100" [class.full]="v.used >= v.cap"></i></div>
+      @if (v.inService) {
+      <div class="vd-bar"><i [style.width.%]="(v.used / v.cap) * 100" [class.full]="v.used >= v.cap"></i></div>
+      }
       <div class="hd">
-        <span class="sub">{{ v.used }}/{{ v.cap }} seats · pending {{ money(v.outstanding) }}</span>
-        <button type="button" class="x-chip" [class.on]="v.active" (click)="toggle(v)">
-          {{ v.active ? 'Active · Suspend' : 'Suspended · Activate' }}
-        </button>
+        <span class="vd-muted">
+          {{ v.used }}/{{ v.cap }} seats · {{ v.fee ? money(v.fee) + '/mo' : 'no fee set' }} @if (v.outstanding) { ·
+          pending {{ money(v.outstanding) }} }
+        </span>
+        <button type="button" class="vd-btn sm soft" (click)="manage(v)">Manage</button>
       </div>
     </article>
-    } }
+    } } @else {
+    <label class="search">
+      <vd-icon name="search" [size]="18" />
+      <input
+        class="vd-input"
+        type="search"
+        placeholder="Search student, guardian, bus"
+        aria-label="Search students"
+        (input)="onSearch($event)"
+      />
+    </label>
+    @if (shown().length) {
+    <div class="vd-list">
+      @for (r of shown(); track r.id) {
+      <button type="button" class="vd-item" (click)="move(r)">
+        <span class="vd-avatar">{{ r.name[0] }}</span>
+        <div class="vd-mid">
+          <b>{{ r.name }}</b>
+          <span>Class {{ r.cls }} · {{ r.stop || 'no stop' }} · {{ r.guardian }}</span>
+        </div>
+        <span class="vd-pill mute">{{ r.vehicle }}</span>
+      </button>
+      }
+    </div>
+    } @else {
+    <div class="vd-card vd-empty">No students</div>
+    } } }
   </div>
 </ion-content>

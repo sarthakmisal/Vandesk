@@ -1,6 +1,6 @@
 import type { OnDestroy } from '@angular/core';
 import { Component, computed, inject, signal } from '@angular/core';
-import { IonContent, ToastController } from '@ionic/angular';
+import { IonContent } from '@ionic/angular';
 
 import type { Direction } from '../core/direction';
 import { defaultDirection } from '../core/direction';
@@ -11,6 +11,8 @@ import { FeesRepo } from '../fees/fees.repo';
 import { ProfileBarComponent } from '../profile-bar/profile-bar.component';
 import type { PInfo } from '../trip/trip.repo';
 import { TripRepo } from '../trip/trip.repo';
+import { IconComponent } from '../ui/icon.component';
+import { Toast } from '../ui/toast.service';
 
 const MONTHS = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ');
 
@@ -19,12 +21,12 @@ const MONTHS = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ');
   selector: 'app-parent',
   templateUrl: 'parent.page.html',
   styleUrls: ['parent.page.scss'],
-  imports: [IonContent, ProfileBarComponent],
+  imports: [IonContent, ProfileBarComponent, IconComponent],
 })
 export class ParentPage implements OnDestroy {
   private readonly trip = inject(TripRepo);
   private readonly fees = inject(FeesRepo);
-  private readonly toast = inject(ToastController);
+  private readonly toast = inject(Toast);
   private timer?: ReturnType<typeof setInterval>;
 
   readonly kids = signal<{ id: string; name: string }[]>([]);
@@ -41,13 +43,13 @@ export class ParentPage implements OnDestroy {
       return '';
     }
     if (!p.going) {
-      return '✓ ' + this.t().notGoing;
+      return this.t().notGoing;
     }
     if (p.status === 'idle') {
       return 'Van has not started yet';
     }
     if (p.picked) {
-      return (p.direction === 'pickup' ? '✓ Picked up at ' : '✓ Dropped at ') + p.picked;
+      return (p.direction === 'pickup' ? 'Picked up at ' : 'Dropped at ') + p.picked;
     }
     if (p.status === 'ended') {
       return 'Trip ended';
@@ -97,8 +99,7 @@ export class ParentPage implements OnDestroy {
     try {
       await this.trip.setGoing(this.child(), g, this.dir());
     } catch (e) {
-      const toast = await this.toast.create({ message: (e as Error).message, duration: 2600, color: 'dark' });
-      await toast.present();
+      this.toast.error((e as Error).message);
     }
     await this.load();
   }

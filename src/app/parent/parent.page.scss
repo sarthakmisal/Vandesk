@@ -1,15 +1,29 @@
-.note {
-  padding: 0 6px;
+.kids {
+  margin-bottom: 14px;
 }
 
-.empty {
-  text-align: center;
-  padding: 30px;
-  color: #94a3b8;
+.status {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.map {
-  color: #4f46e5;
+.msg {
+  font-size: 20px;
+  line-height: 1.25;
   font-weight: 700;
-  text-decoration: none;
+  letter-spacing: -0.02em;
+
+  &.big {
+    font-size: 36px;
+    letter-spacing: -0.03em;
+  }
+}
+
+.vd-st small {
+  font-weight: 500;
+}
+
+.note {
+  padding: 0 4px;
 }

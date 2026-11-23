@@ -1,145 +1,158 @@
-/* Phone on a stand: huge text, one primary button, no clutter. Works upright and sideways. */
 .d-wrap {
   display: flex;
   flex-direction: column;
   min-height: 100%;
-  max-width: 900px;
+  max-width: 760px;
   margin: 0 auto;
-  padding: calc(14px + env(safe-area-inset-top, 0px)) 16px calc(16px + env(safe-area-inset-bottom, 0px));
+  padding: calc(12px + env(safe-area-inset-top, 0px)) 16px calc(16px + env(safe-area-inset-bottom, 0px));
+}
+
+.d-seg {
+  margin-top: 16px;
 }
 
 .d-top {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   margin-bottom: 8px;
 }
 
 .d-count {
   font-size: 22px;
-  font-weight: 800;
-  color: #4f46e5;
+  font-weight: 700;
+  color: var(--vd-brand);
+}
+
+.d-prog {
+  margin-bottom: 14px;
 }
 
 .d-panel {
-  flex: 1;
   display: flex;
+  flex: 1;
   flex-direction: column;
   justify-content: space-between;
   gap: 16px;
   text-align: center;
 }
 
-.d-who {
-  flex: 1;
+.d-who,
+.d-center {
   display: flex;
+  flex: 1;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  gap: 6px;
-  background: #fff;
+  justify-content: center;
+  gap: 8px;
+}
+
+.d-who {
+  padding: 20px;
+  border: 1px solid var(--vd-line);
   border-radius: 28px;
-  padding: 18px;
+  background: var(--vd-surface);
+}
+
+.d-center {
+  color: var(--vd-brand);
 }
 
 .d-av {
-  width: clamp(72px, 16vw, 120px);
-  height: clamp(72px, 16vw, 120px);
-  border-radius: 28px;
   display: grid;
   place-items: center;
-  font-size: clamp(40px, 9vw, 72px);
-  font-weight: 800;
-  color: #4f46e5;
-  background: #eef0ff;
+  width: clamp(72px, 16vw, 112px);
+  height: clamp(72px, 16vw, 112px);
+  border-radius: 50%;
+  background: var(--vd-brand-soft);
+  color: var(--vd-brand);
+  font-size: clamp(36px, 8vw, 60px);
+  font-weight: 700;
 }
 
 .d-name {
-  font-size: clamp(34px, 9vw, 64px);
-  font-weight: 800;
+  font-size: clamp(32px, 9vw, 60px);
   line-height: 1.1;
-  color: #0f172a;
+  font-weight: 700;
+  letter-spacing: -0.03em;
 }
 
 .d-stop {
-  font-size: clamp(20px, 5vw, 32px);
-  font-weight: 700;
-  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--vd-ink-2);
+  font-size: clamp(18px, 5vw, 28px);
+  font-weight: 600;
 }
 
 .d-big {
-  font-size: clamp(64px, 18vw, 140px);
-  font-weight: 800;
-  color: #4f46e5;
+  font-size: clamp(72px, 20vw, 140px);
   line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.04em;
 }
 
 .d-sub {
-  font-size: clamp(20px, 5vw, 30px);
-  font-weight: 700;
-  color: #475569;
+  color: var(--vd-ink-2);
+  font-size: clamp(20px, 5vw, 28px);
+  font-weight: 600;
 }
 
 .d-sum {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--vd-brand);
   font-size: 26px;
-  font-weight: 800;
-  color: #059669;
+  font-weight: 700;
 }
 
 .d-btn {
   width: 100%;
-  min-height: clamp(110px, 24vh, 200px);
-  border: 0;
-  border-radius: 32px;
-  font-size: clamp(34px, 9vw, 60px);
-  font-weight: 800;
-  text-transform: uppercase;
-  color: #fff;
-  background: linear-gradient(135deg, #10b981, #059669);
-  box-shadow: 0 22px 40px -16px rgba(5, 150, 105, 0.65);
-
-  &.end {
-    background: linear-gradient(135deg, #4f46e5, #7c3aed);
-    box-shadow: 0 22px 40px -16px rgba(79, 70, 229, 0.6);
-  }
+  min-height: clamp(104px, 22vh, 180px);
+  gap: 14px;
+  border-radius: 28px;
+  font-size: clamp(30px, 8vw, 52px);
+  font-weight: 700;
 }
 
 .d-foot {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   padding-top: 14px;
 }
 
 .d-next {
+  color: var(--vd-ink-3);
   font-size: 18px;
-  font-weight: 700;
-  color: #94a3b8;
+  font-weight: 600;
 }
 
 .d-links {
   display: flex;
-  gap: 8px;
-  justify-content: center;
   flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
 }
 
 .d-link {
-  border: 0;
-  background: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 10px 14px;
+  color: var(--vd-ink-2);
   font-size: 16px;
-  font-weight: 700;
-  color: #64748b;
+  font-weight: 600;
 
   &.center {
-    display: block;
+    display: flex;
     margin: 14px auto 0;
   }
 }
 
-/* sideways on a stand: student on the left, the big button on the right */
 @media (orientation: landscape) and (max-height: 520px) {
   .d-panel {
     flex-direction: row;
